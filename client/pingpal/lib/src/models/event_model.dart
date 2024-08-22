@@ -7,5 +7,6 @@ class Event {
     required this.title,
     required this.date,
     required this.location,
+    required String description,
   });
 }

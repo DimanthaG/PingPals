@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:pingpal/src/screens/create_event_screen.dart';
+import 'package:pingpal/src/screens/create_ping_screen.dart';
 import 'package:pingpal/src/screens/friend_list_screen.dart';
 import 'package:pingpal/src/screens/home_screen.dart';
 import 'package:pingpal/src/screens/notifications_screen.dart';
 import 'package:pingpal/src/screens/settings_screen.dart';
+import 'package:pingpal/theme/theme_notifier.dart';
 
 class NavBar extends StatefulWidget {
-  const NavBar({super.key});
+  final ThemeNotifier themeNotifier;
+
+  const NavBar({super.key, required this.themeNotifier});
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -15,9 +18,6 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 0;
 
-  // Custom color scheme and icon size
-  final Color _selectedItemColor = Colors.blueAccent;
-  final Color _unselectedItemColor = Colors.grey;
   final double _iconSize = 30;
 
   @override
@@ -30,7 +30,9 @@ class _NavBarState extends State<NavBar> {
           FriendListScreen(),
           CreateEventScreen(),
           NotificationsScreen(),
-          SettingsScreen(),
+          SettingsScreen(
+              themeNotifier:
+                  widget.themeNotifier), // Pass the themeNotifier here
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -45,20 +47,21 @@ class _NavBarState extends State<NavBar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_circle, size: _iconSize),
-            label: 'Create Event',
+            label: 'Ping',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications, size: _iconSize),
-            label: 'Notifications',
+            label: 'Your Pings',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings, size: _iconSize),
-            label: 'Settings',
+            label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: _selectedItemColor,
-        unselectedItemColor: _unselectedItemColor,
+        selectedItemColor: Colors.yellow[700], // Yellow for selected item
+        unselectedItemColor:
+            widget.themeNotifier.isDarkMode ? Colors.grey : Colors.black54,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -69,7 +72,8 @@ class _NavBarState extends State<NavBar> {
           });
         },
         elevation: 10,
-        backgroundColor: Colors.black,
+        backgroundColor:
+            widget.themeNotifier.isDarkMode ? Colors.black : Colors.white,
       ),
     );
   }
