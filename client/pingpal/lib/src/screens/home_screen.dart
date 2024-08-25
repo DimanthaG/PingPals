@@ -5,16 +5,35 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'PingPals!',
-          style: TextStyle(
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: theme.colorScheme.onPrimary,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 255, 149, 0),
+        backgroundColor: theme.colorScheme.primary,
+        elevation: 0,
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications, color: theme.colorScheme.onPrimary),
+            onPressed: () {
+              // Handle notification tap
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.person, color: theme.colorScheme.onPrimary),
+            onPressed: () {
+              // Handle profile tap
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -25,376 +44,124 @@ class HomeScreen extends StatelessWidget {
               // Search Bar
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    prefixIcon: Icon(Icons.search, color: Colors.black54),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                      borderSide: BorderSide.none,
+                child: Material(
+                  elevation: 5,
+                  shadowColor: isDarkMode ? Colors.black54 : Colors.black12,
+                  borderRadius: BorderRadius.circular(30.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      prefixIcon: Icon(Icons.search,
+                          color: isDarkMode ? Colors.white54 : Colors.black54),
+                      filled: true,
+                      fillColor: theme.cardColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 15.0),
                     ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 15.0),
                   ),
                 ),
               ),
 
               // Pinned Events Section
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 'Pinned Events',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: theme.textTheme.headlineSmall,
               ),
-              SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0, bottom: 30.0),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(87, 101, 242, 1),
-                        borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(8),
-                        topLeft: Radius.circular(8),),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.discord, size: 40, color: Colors.white),
-                          Spacer(),
-                          Text(
-                            'Clubhouse',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Deal!',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 220.0),
-                          child: Text(
-                            'in 12:22',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Geeneth Kulutunge',
-                                  style: TextStyle(color: Colors.orange),
-                                ),
-                              ),
-                              
-                              
-                              Row(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(3.0),
-                                        child: Text(
-                                          'Amantha',
-                                          style: TextStyle(color: Colors.green),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(3.0),
-                                        child: Text(
-                                          'Dimantha',
-                                          style: TextStyle(color: Colors.green),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(3.0),
-                                        child: Text(
-                                          'Hakkam',
-                                          style: TextStyle(color: Colors.green),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(3.0),
-                                        child: Text(
-                                          'Nethma',
-                                          style: TextStyle(color: Colors.green),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 60.0), // Adjust the left padding value as needed
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(3.0),
-                                          child: Text(
-                                            'Thulana',
-                                            style: TextStyle(color: Colors.green),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(3.0),
-                                          child: Text(
-                                            'Geeneth',
-                                            style: TextStyle(color: Colors.green),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(3.0),
-                                          child: Text(
-                                            'Sheveen',
-                                            style: TextStyle(color: Colors.green),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(3.0),
-                                          child: Text(
-                                            'Autism',
-                                            style: TextStyle(color: Colors.green),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.location_on, color: Colors.amber[700]),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0), // Add padding around the container
-                      child: Container(
-                        padding: EdgeInsets.only(left: 20,top: 8,right:20 ,bottom: 8), // Inner padding of the container
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8.0),
-                          
-                        ),
-                        
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: TextEditingController(text: "Hey, I'll be a few minutes late"),
-                                 style: TextStyle(
-                                  fontSize: 14, // Adjust the font size as needed
-                                ),
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                            Icon(Icons.send, color: Colors.black54),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              Divider(
+                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                thickness: 1,
+                height: 20,
               ),
-
+              const SizedBox(height: 10),
+              _buildPinnedEventCard(theme, isDarkMode),
 
               // Upcoming Events Section
-              SizedBox(height: 20),
-              Text(
-                'Upcoming Events',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+              const SizedBox(height: 30),
+              _buildSectionHeader('Upcoming Events', Colors.blueAccent,
+                  Icons.calendar_today, theme),
+              const SizedBox(height: 10),
+              _buildEventCard(
+                title: 'Deal!',
+                organizer: 'Geeneth Kulutunge',
+                timeLeft: '12:22',
+                participants: 'Nethma, Amantha, Dimantha, Hakkam',
+                theme: theme,
+                isDarkMode: isDarkMode,
               ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: EventCard(
-                  title: 'Deal!',
-                  organizer: 'Geeneth Kulutunge',
-                  timeLeft: '12:22',
-                  participants: 'Nethma, Amantha, Dimantha, Hakkam',
-                ),
+              _buildEventCard(
+                title: 'QuickWit',
+                organizer: 'Roosanda',
+                timeLeft: '1:30:12',
+                participants: 'Nethma, Amantha, Dimantha',
+                theme: theme,
+                isDarkMode: isDarkMode,
               ),
-              Container(
-                width: double.infinity,
-                child: EventCard(
-                  title: 'QuickWit',
-                  organizer: 'Roosanda',
-                  timeLeft: '1:30:12',
-                  participants: 'Nethma, Amantha, Dimantha',
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                child: EventCard(
-                  title: 'Minecraft',
-                  organizer: 'DimanthaG',
-                  timeLeft: '20:32',
-                  participants: 'Nethma',
-                ),
+              _buildEventCard(
+                title: 'Minecraft',
+                organizer: 'DimanthaG',
+                timeLeft: '20:32',
+                participants: 'Nethma',
+                theme: theme,
+                isDarkMode: isDarkMode,
               ),
 
               // Invited Events Section
-              SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  'Invited Events',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              const SizedBox(height: 30),
+              _buildSectionHeader(
+                  'Invited Events', Colors.green, Icons.mail_outline, theme),
+              const SizedBox(height: 10),
+              _buildEventCardSmall(
+                title: 'Longlegs',
+                date: '22/08/2024',
+                time: '14:00',
+                accepted: 'Geeneth',
+                theme: theme,
+                isDarkMode: isDarkMode,
+                cardColor: isDarkMode ? Colors.green[800]! : Colors.green[100]!,
+                textColor: isDarkMode ? Colors.white : Colors.black87,
               ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: EventCardSmall(
-                  title: 'Longlegs',
-                  date: '22/08/2024',
-                  time: '14:00',
-                  accepted: 'Geeneth',
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                child: EventCardSmall(
-                  title: 'Longlegs',
-                  date: '22/08/2024',
-                  time: '14:00',
-                  accepted: 'Geeneth',
-                ),
+              _buildEventCardSmall(
+                title: 'Longlegs',
+                date: '22/08/2024',
+                time: '14:00',
+                accepted: 'Geeneth',
+                theme: theme,
+                isDarkMode: isDarkMode,
+                cardColor: isDarkMode ? Colors.green[800]! : Colors.green[100]!,
+                textColor: isDarkMode ? Colors.white : Colors.black87,
               ),
 
               // Created Events Section
-              SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                child: Text(
-                  'Created Events',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: EventCardSmall(
-                  title: 'Longlegs',
-                  date: '22/08/2024',
-                  time: '14:00',
-                  accepted: 'Geeneth',
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                child: EventCardSmall(
-                  title: 'Longlegs',
-                  date: '22/08/2024',
-                  time: '14:00',
-                  accepted: 'Geeneth',
-                ),
-              ),
-
-              // Invited Events Section
-              SizedBox(height: 20),
-              Text(
-                'Invited Events',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              EventCardSmall(
+              const SizedBox(height: 30),
+              _buildSectionHeader('Created Events', Colors.orangeAccent,
+                  Icons.add_circle_outline, theme),
+              const SizedBox(height: 10),
+              _buildEventCardSmall(
                 title: 'Longlegs',
                 date: '22/08/2024',
                 time: '14:00',
                 accepted: 'Geeneth',
+                theme: theme,
+                isDarkMode: isDarkMode,
+                cardColor:
+                    isDarkMode ? Colors.orange[800]! : Colors.orange[100]!,
+                textColor: isDarkMode ? Colors.white : Colors.black87,
               ),
-              EventCardSmall(
+              _buildEventCardSmall(
                 title: 'Longlegs',
                 date: '22/08/2024',
                 time: '14:00',
                 accepted: 'Geeneth',
-              ),
-
-              // Created Events Section
-              SizedBox(height: 20),
-              Text(
-                'Created Events',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              EventCardSmall(
-                title: 'Longlegs',
-                date: '22/08/2024',
-                time: '14:00',
-                accepted: 'Geeneth',
-              ),
-              EventCardSmall(
-                title: 'Longlegs',
-                date: '22/08/2024',
-                time: '14:00',
-                accepted: 'Geeneth',
+                theme: theme,
+                isDarkMode: isDarkMode,
+                cardColor:
+                    isDarkMode ? Colors.orange[800]! : Colors.orange[100]!,
+                textColor: isDarkMode ? Colors.white : Colors.black87,
               ),
             ],
           ),
@@ -402,128 +169,367 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-// Event Card Widget for Upcoming Events
-class EventCard extends StatelessWidget {
-  final String title;
-  final String organizer;
-  final String timeLeft;
-  final String participants;
-
-  const EventCard({
-    super.key,
-    required this.title,
-    required this.organizer,
-    required this.timeLeft,
-    required this.participants,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+  Widget _buildSectionHeader(
+      String title, Color color, IconData icon, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(icon, color: color),
+              onPressed: () {
+                // Navigate to a detailed section view
+              },
             ),
-          ),
-          Text(
-            organizer,
-            style: TextStyle(color: Colors.orange),
-          ),
-          Text(
-            participants,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'in $timeLeft',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.headlineSmall,
+              ),
             ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPinnedEventCard(ThemeData theme, bool isDarkMode) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to event details
+      },
+      child: SizedBox(
+        width: double.infinity, // Fill the entire width of the screen
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: isDarkMode
+                ? const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 60, 62, 91), // Darker shade
+                      Color.fromARGB(
+                          255, 70, 73, 100), // Slightly lighter shade
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 255, 255, 255),
+                      Color.fromARGB(255, 255, 255, 255),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: [
+              BoxShadow(
+                color: isDarkMode ? Colors.black26 : Colors.black12,
+                blurRadius: 10,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Event Banner
+              Container(
+                padding: const EdgeInsets.all(20.0),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromRGBO(87, 101, 242, 1),
+                      Color.fromRGBO(74, 144, 226, 1),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.discord, size: 40, color: Colors.white),
+                    Spacer(),
+                    Text(
+                      'Clubhouse',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Event Title and Countdown
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Deal!',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                              color: isDarkMode ? Colors.white : Colors.black),
+                        ),
+                        Text(
+                          'in 12:22',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                              color: isDarkMode ? Colors.grey : Colors.black54),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Organizer Name
+                    Text(
+                      'Geeneth Kulutunge',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDarkMode ? Colors.orange : Colors.blueAccent,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Participant List
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildParticipantColumn(
+                            ['Amantha', 'Dimantha', 'Hakkam', 'Nethma'], theme),
+                        _buildParticipantColumn(
+                            ['Thulana', 'Geeneth', 'Sheveen', 'Autism'], theme),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Comment Box
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 12.0),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: TextEditingController(
+                                text: "Hey, I'll be a few minutes late",
+                              ),
+                              style: theme.textTheme.bodyMedium,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Leave a comment...',
+                                hintStyle: theme.textTheme.labelSmall,
+                              ),
+                            ),
+                          ),
+                          Icon(Icons.send,
+                              color:
+                                  isDarkMode ? Colors.white54 : Colors.black54),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
-}
 
-// Event Card Widget for Invited/Created Events
-class EventCardSmall extends StatelessWidget {
-  final String title;
-  final String date;
-  final String time;
-  final String accepted;
-
-  const EventCardSmall({
-    super.key,
-    required this.title,
-    required this.date,
-    required this.time,
-    required this.accepted,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.all(16.0),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+  Widget _buildParticipantColumn(List<String> participants, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: participants
+          .map(
+            (participant) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Text(
+                participant,
+                style: theme.textTheme.bodyLarge
+                    ?.copyWith(color: theme.colorScheme.secondary),
+              ),
             ),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _buildEventCard({
+    required String title,
+    required String organizer,
+    required String timeLeft,
+    required String participants,
+    required ThemeData theme,
+    required bool isDarkMode,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        // Handle event card tap
+      },
+      child: SizedBox(
+        width: double.infinity, // Fill the entire width of the screen
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            gradient: isDarkMode
+                ? const LinearGradient(
+                    colors: [Color(0xFF3A3D5C), Color(0xFF5A5D7C)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : const LinearGradient(
+                    colors: [Color(0xFFF5F5F5), Color(0xFFFFFFFF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
           ),
-          Text(
-            '$date $time',
-            style: TextStyle(color: Colors.orange),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Event Title
+              Text(
+                title,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                    color: isDarkMode ? Colors.white : Colors.black87),
+              ),
+              const SizedBox(height: 5),
+              // Organizer
+              Text(
+                organizer,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.orange : Colors.blueAccent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 5),
+              // Participants
+              Text(
+                participants,
+                style: TextStyle(
+                    color: isDarkMode ? Colors.grey[300] : Colors.black54),
+              ),
+              const SizedBox(height: 10),
+              // Time Left
+              LinearProgressIndicator(
+                value: calculateTimeLeftPercentage(timeLeft),
+                backgroundColor:
+                    isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                color: isDarkMode ? Colors.redAccent : Colors.orangeAccent,
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Handle Join
+                    },
+                    child: Text('Join'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Handle Details
+                    },
+                    child: Text('Details'),
+                  ),
+                ],
+              ),
+            ],
           ),
-          SizedBox(height: 10),
-          Text(
-            'Accepted: $accepted',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
-        ],
+        ),
       ),
     );
+  }
+
+  Widget _buildEventCardSmall({
+    required String title,
+    required String date,
+    required String time,
+    required String accepted,
+    required ThemeData theme,
+    required bool isDarkMode,
+    required Color cardColor,
+    required Color textColor,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        // Handle small event card tap
+      },
+      child: SizedBox(
+        width: double.infinity, // Fill the entire width of the screen
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Event Title
+              Text(
+                title,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: textColor,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 5),
+              // Date and Time
+              Text(
+                '$date | $time',
+                style:
+                    theme.textTheme.bodyMedium?.copyWith(color: Colors.orange),
+              ),
+              const SizedBox(height: 10),
+              // Accepted
+              Text(
+                'Accepted: $accepted',
+                style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  double calculateTimeLeftPercentage(String timeLeft) {
+    // Dummy implementation to calculate the percentage of time left
+    // Replace with actual calculation logic based on your event time
+    return 0.5;
   }
 }
