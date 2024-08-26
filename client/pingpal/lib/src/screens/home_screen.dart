@@ -14,26 +14,14 @@ class HomeScreen extends StatelessWidget {
           'PingPals!',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onPrimary,
+            color: theme
+                .colorScheme.onPrimary, // Ensures the text color contrasts well
           ),
         ),
-        backgroundColor: theme.colorScheme.primary,
+        backgroundColor: const Color.fromARGB(
+            255, 255, 200, 62), // Change the color to yellow
         elevation: 0,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications, color: theme.colorScheme.onPrimary),
-            onPressed: () {
-              // Handle notification tap
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.person, color: theme.colorScheme.onPrimary),
-            onPressed: () {
-              // Handle profile tap
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
