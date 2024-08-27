@@ -27,7 +27,7 @@ class _NavBarState extends State<NavBar> {
         index: _selectedIndex,
         children: [
           HomeScreen(),
-          FriendListScreen(),
+          PalsScreen(),
           CreateEventScreen(),
           NotificationsScreen(),
           SettingsScreen(
@@ -43,7 +43,7 @@ class _NavBarState extends State<NavBar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people, size: _iconSize),
-            label: 'Friends',
+            label: 'Pals',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_circle, size: _iconSize),
