@@ -3,9 +3,9 @@ package com.pingpals.pingpals.Controller;
 import com.pingpals.pingpals.Model.User;
 import com.pingpals.pingpals.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -15,7 +15,19 @@ public class UserController {
 
     @PostMapping("/addUser")
     public void addUser(@RequestBody User user) {
+        user.setId(null);
         userRepository.save(user);
+    }
+
+    @GetMapping("/getUserById/{userId}")
+    public User getUserById(@PathVariable String userId) {
+        System.out.println(userId);
+        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @GetMapping("/getAllUsers")
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
 }

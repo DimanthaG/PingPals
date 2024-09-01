@@ -1,5 +1,6 @@
 package com.pingpals.pingpals.Model;
 
+import com.pingpals.pingpals.Model.Enum.FriendRequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,22 +8,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Document
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class FriendRequest {
 
     @Id
     private String id;
+    
+    private String sender;
 
-    @Indexed(unique = true)
-    private String username;
+    private String receiver;
 
-    private String password;
+    private LocalDateTime issuedTime;
 
-    private List<String> friends;
+    private FriendRequestStatus status;
 
 }
