@@ -3,7 +3,7 @@ import 'package:pingpal/src/screens/create_ping_screen.dart';
 import 'package:pingpal/src/screens/friend_list_screen.dart';
 import 'package:pingpal/src/screens/home_screen.dart';
 import 'package:pingpal/src/screens/notifications_screen.dart';
-import 'package:pingpal/src/screens/settings_screen.dart';
+import 'package:pingpal/src/screens/profile_screen.dart';
 import 'package:pingpal/theme/theme_notifier.dart';
 
 class NavBar extends StatefulWidget {
@@ -29,8 +29,8 @@ class _NavBarState extends State<NavBar> {
           HomeScreen(),
           PalsScreen(),
           CreateEventScreen(),
-          NotificationsScreen(),
-          SettingsScreen(
+          EventsPage(),
+          ProfilePage(
               themeNotifier:
                   widget.themeNotifier), // Pass the themeNotifier here
         ],
