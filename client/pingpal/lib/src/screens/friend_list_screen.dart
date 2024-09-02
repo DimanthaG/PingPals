@@ -27,7 +27,8 @@ class _PalsScreenState extends State<PalsScreen> {
             color: theme.colorScheme.onPrimary,
           ),
         ),
-        backgroundColor: theme.colorScheme.primary,
+        backgroundColor:
+            isDarkMode ? const Color(0xFFFF8C00) : const Color(0xFFFFC800),
         elevation: 0,
         centerTitle: true,
         actions: [
@@ -76,9 +77,9 @@ class _PalsScreenState extends State<PalsScreen> {
 
             // Pals List Section
             ListView.builder(
-              shrinkWrap: true, // Allows ListView to be inside a ScrollView
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: 10, // Replace with the actual number of pals
+              itemCount: 10,
               itemBuilder: (context, index) {
                 return _buildPalCard(
                   theme,
@@ -161,11 +162,10 @@ class _PalsScreenState extends State<PalsScreen> {
   }
 
   Widget _buildCollapsibleFriendRequestsSection(ThemeData theme) {
-    // Example friend requests
     final friendRequests = [
       'Friend Request 1',
       'Friend Request 2',
-      'Friend Request 3',
+      'Friend Request 3'
     ];
 
     return ExpansionTile(
