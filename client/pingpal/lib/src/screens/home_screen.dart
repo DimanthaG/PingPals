@@ -14,12 +14,12 @@ class HomeScreen extends StatelessWidget {
           'PingPals!',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: theme
-                .colorScheme.onPrimary, // Ensures the text color contrasts well
+            color: theme.colorScheme.onPrimary,
           ),
         ),
-        backgroundColor: const Color.fromARGB(
-            255, 255, 200, 62), // Change the color to yellow
+        backgroundColor: isDarkMode
+            ? const Color(0xFFFF8C00) // Dark Mode Orange
+            : const Color(0xFFFFC800), // Light Mode Yellow
         elevation: 0,
         centerTitle: true,
       ),
@@ -40,9 +40,10 @@ class HomeScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: 'Search...',
                       prefixIcon: Icon(Icons.search,
-                          color: isDarkMode ? Colors.white54 : Colors.black54),
+                          color: isDarkMode ? Colors.white70 : Colors.black54),
                       filled: true,
-                      fillColor: theme.cardColor,
+                      fillColor:
+                          isDarkMode ? Colors.grey[800] : theme.cardColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
                         borderSide: BorderSide.none,
@@ -50,6 +51,8 @@ class HomeScreen extends StatelessWidget {
                       contentPadding:
                           const EdgeInsets.symmetric(vertical: 15.0),
                     ),
+                    style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black),
                   ),
                 ),
               ),
@@ -58,7 +61,10 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 'Pinned Events',
-                style: theme.textTheme.headlineSmall,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
               Divider(
                 color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
@@ -70,8 +76,12 @@ class HomeScreen extends StatelessWidget {
 
               // Upcoming Events Section
               const SizedBox(height: 30),
-              _buildSectionHeader('Upcoming Events', Colors.blueAccent,
-                  Icons.calendar_today, theme),
+              _buildSectionHeader('Upcoming Events', theme, isDarkMode),
+              Divider(
+                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                thickness: 1,
+                height: 20,
+              ),
               const SizedBox(height: 10),
               _buildEventCard(
                 title: 'Deal!',
@@ -80,6 +90,9 @@ class HomeScreen extends StatelessWidget {
                 participants: 'Nethma, Amantha, Dimantha, Hakkam',
                 theme: theme,
                 isDarkMode: isDarkMode,
+                backgroundColor:
+                    isDarkMode ? Color(0xFFEA580C) : Color(0xFFFFB74D),
+                textColor: isDarkMode ? Colors.white : Colors.black,
               ),
               _buildEventCard(
                 title: 'QuickWit',
@@ -88,6 +101,9 @@ class HomeScreen extends StatelessWidget {
                 participants: 'Nethma, Amantha, Dimantha',
                 theme: theme,
                 isDarkMode: isDarkMode,
+                backgroundColor:
+                    isDarkMode ? Color(0xFFD81B60) : Color(0xFFF48FB1),
+                textColor: isDarkMode ? Colors.white : Colors.black,
               ),
               _buildEventCard(
                 title: 'Minecraft',
@@ -96,61 +112,34 @@ class HomeScreen extends StatelessWidget {
                 participants: 'Nethma',
                 theme: theme,
                 isDarkMode: isDarkMode,
+                backgroundColor:
+                    isDarkMode ? Color(0xFFEF6C00) : Color(0xFFFFCC80),
+                textColor: isDarkMode ? Colors.white : Colors.black,
               ),
 
               // Invited Events Section
               const SizedBox(height: 30),
-              _buildSectionHeader(
-                  'Invited Events', Colors.green, Icons.mail_outline, theme),
+              _buildSectionHeader('Invited Events', theme, isDarkMode),
+              Divider(
+                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                thickness: 1,
+                height: 20,
+              ),
               const SizedBox(height: 10),
-              _buildEventCardSmall(
-                title: 'Longlegs',
-                date: '22/08/2024',
-                time: '14:00',
-                accepted: 'Geeneth',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                cardColor: isDarkMode ? Colors.green[800]! : Colors.green[100]!,
-                textColor: isDarkMode ? Colors.white : Colors.black87,
-              ),
-              _buildEventCardSmall(
-                title: 'Longlegs',
-                date: '22/08/2024',
-                time: '14:00',
-                accepted: 'Geeneth',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                cardColor: isDarkMode ? Colors.green[800]! : Colors.green[100]!,
-                textColor: isDarkMode ? Colors.white : Colors.black87,
-              ),
+              _buildHorizontalScrollableEventCards(theme, isDarkMode,
+                  isCreatedEvents: false),
 
               // Created Events Section
               const SizedBox(height: 30),
-              _buildSectionHeader('Created Events', Colors.orangeAccent,
-                  Icons.add_circle_outline, theme),
+              _buildSectionHeader('Created Events', theme, isDarkMode),
+              Divider(
+                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                thickness: 1,
+                height: 20,
+              ),
               const SizedBox(height: 10),
-              _buildEventCardSmall(
-                title: 'Longlegs',
-                date: '22/08/2024',
-                time: '14:00',
-                accepted: 'Geeneth',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                cardColor:
-                    isDarkMode ? Colors.orange[800]! : Colors.orange[100]!,
-                textColor: isDarkMode ? Colors.white : Colors.black87,
-              ),
-              _buildEventCardSmall(
-                title: 'Longlegs',
-                date: '22/08/2024',
-                time: '14:00',
-                accepted: 'Geeneth',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                cardColor:
-                    isDarkMode ? Colors.orange[800]! : Colors.orange[100]!,
-                textColor: isDarkMode ? Colors.white : Colors.black87,
-              ),
+              _buildHorizontalScrollableEventCards(theme, isDarkMode,
+                  isCreatedEvents: true),
             ],
           ),
         ),
@@ -158,15 +147,15 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(
-      String title, Color color, IconData icon, ThemeData theme) {
+  Widget _buildSectionHeader(String title, ThemeData theme, bool isDarkMode) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             IconButton(
-              icon: Icon(icon, color: color),
+              icon: Icon(Icons.calendar_today,
+                  color: isDarkMode ? Colors.white70 : Colors.black),
               onPressed: () {
                 // Navigate to a detailed section view
               },
@@ -175,7 +164,10 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: theme.textTheme.headlineSmall,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
               ),
             ),
           ],
@@ -190,54 +182,35 @@ class HomeScreen extends StatelessWidget {
         // Navigate to event details
       },
       child: SizedBox(
-        width: double.infinity, // Fill the entire width of the screen
+        width: double.infinity,
         child: Container(
           decoration: BoxDecoration(
-            gradient: isDarkMode
-                ? const LinearGradient(
-                    colors: [
-                      Color.fromARGB(255, 60, 62, 91), // Darker shade
-                      Color.fromARGB(
-                          255, 70, 73, 100), // Slightly lighter shade
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : const LinearGradient(
-                    colors: [
-                      Color.fromARGB(255, 255, 255, 255),
-                      Color.fromARGB(255, 255, 255, 255),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-            borderRadius: BorderRadius.circular(12.0),
+            color: isDarkMode ? Color(0xFF7B1FA2) : Color(0xFFCE93D8),
+            borderRadius: BorderRadius.circular(20.0),
             boxShadow: [
               BoxShadow(
-                color: isDarkMode ? Colors.black26 : Colors.black12,
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+                color: isDarkMode ? Colors.black54 : Colors.black12,
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Event Banner
               Container(
                 padding: const EdgeInsets.all(20.0),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Color.fromRGBO(87, 101, 242, 1),
-                      Color.fromRGBO(74, 144, 226, 1),
-                    ],
+                    colors: isDarkMode
+                        ? [Color(0xFF5E35B1), Color(0xFFBA68C8)]
+                        : [Color(0xFF6A1B9A), Color(0xFFBA68C8)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
                 ),
                 child: Row(
@@ -261,7 +234,6 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Event Title and Countdown
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -278,8 +250,6 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 10),
-
-                    // Organizer Name
                     Text(
                       'Geeneth Kulutunge',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -287,8 +257,6 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 10),
-
-                    // Participant List
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -299,14 +267,12 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-
-                    // Comment Box
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 12.0),
                       decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(8.0),
+                        color: isDarkMode ? Colors.grey[800] : theme.cardColor,
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: Row(
                         children: [
@@ -315,11 +281,16 @@ class HomeScreen extends StatelessWidget {
                               controller: TextEditingController(
                                 text: "Hey, I'll be a few minutes late",
                               ),
-                              style: theme.textTheme.bodyMedium,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Leave a comment...',
-                                hintStyle: theme.textTheme.labelSmall,
+                                hintStyle: theme.textTheme.labelSmall?.copyWith(
+                                    color: isDarkMode
+                                        ? Colors.white54
+                                        : Colors.black54),
                               ),
                             ),
                           ),
@@ -348,8 +319,10 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: Text(
                 participant,
-                style: theme.textTheme.bodyLarge
-                    ?.copyWith(color: theme.colorScheme.secondary),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           )
@@ -364,91 +337,92 @@ class HomeScreen extends StatelessWidget {
     required String participants,
     required ThemeData theme,
     required bool isDarkMode,
+    required Color backgroundColor,
+    required Color textColor,
   }) {
     return GestureDetector(
       onTap: () {
         // Handle event card tap
       },
       child: SizedBox(
-        width: double.infinity, // Fill the entire width of the screen
+        width: double.infinity,
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 10.0),
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            gradient: isDarkMode
-                ? const LinearGradient(
-                    colors: [Color(0xFF3A3D5C), Color(0xFF5A5D7C)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : const LinearGradient(
-                    colors: [Color(0xFFF5F5F5), Color(0xFFFFFFFF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-            borderRadius: BorderRadius.circular(12.0),
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(20.0),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, 5),
+                blurRadius: 15,
+                offset: Offset(0, 8),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Event Title
               Text(
                 title,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                    color: isDarkMode ? Colors.white : Colors.black87),
+                style:
+                    theme.textTheme.headlineSmall?.copyWith(color: textColor),
               ),
               const SizedBox(height: 5),
-              // Organizer
               Text(
                 organizer,
                 style: TextStyle(
-                  color: isDarkMode ? Colors.orange : Colors.blueAccent,
+                  color: textColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 5),
-              // Participants
               Text(
                 participants,
-                style: TextStyle(
-                    color: isDarkMode ? Colors.grey[300] : Colors.black54),
+                style: TextStyle(color: textColor.withOpacity(0.7)),
               ),
               const SizedBox(height: 10),
-              // Time Left
-              LinearProgressIndicator(
-                value: calculateTimeLeftPercentage(timeLeft),
-                backgroundColor:
-                    isDarkMode ? Colors.grey[800] : Colors.grey[300],
-                color: isDarkMode ? Colors.redAccent : Colors.orangeAccent,
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle Join
-                    },
-                    child: Text('Join'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle Details
-                    },
-                    child: Text('Details'),
-                  ),
-                ],
+              Text(
+                'in $timeLeft',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.redAccent,
+                ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildHorizontalScrollableEventCards(ThemeData theme, bool isDarkMode,
+      {required bool isCreatedEvents}) {
+    List<Color> eventColors = [
+      isDarkMode ? Colors.blue[800]! : Colors.blue[100]!,
+      isDarkMode ? Colors.green[800]! : Colors.green[100]!,
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (int i = 0; i < 3; i++)
+            Container(
+              margin: const EdgeInsets.only(right: 10),
+              child: _buildEventCardSmall(
+                title: 'Longlegs',
+                date: '22/08/2024',
+                time: '14:00',
+                accepted: 'Geeneth',
+                theme: theme,
+                isDarkMode: isDarkMode,
+                cardColor: isCreatedEvents ? eventColors[1] : eventColors[0],
+                textColor: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -468,25 +442,24 @@ class HomeScreen extends StatelessWidget {
         // Handle small event card tap
       },
       child: SizedBox(
-        width: double.infinity, // Fill the entire width of the screen
+        width: 200, // Adjusted width for horizontal scrolling
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 10.0),
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             color: cardColor,
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(20.0),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, 5),
+                blurRadius: 15,
+                offset: Offset(0, 8),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Event Title
               Text(
                 title,
                 style: theme.textTheme.headlineSmall?.copyWith(
@@ -495,14 +468,12 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5),
-              // Date and Time
               Text(
                 '$date | $time',
                 style:
                     theme.textTheme.bodyMedium?.copyWith(color: Colors.orange),
               ),
               const SizedBox(height: 10),
-              // Accepted
               Text(
                 'Accepted: $accepted',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -513,11 +484,5 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  double calculateTimeLeftPercentage(String timeLeft) {
-    // Dummy implementation to calculate the percentage of time left
-    // Replace with actual calculation logic based on your event time
-    return 0.5;
   }
 }
