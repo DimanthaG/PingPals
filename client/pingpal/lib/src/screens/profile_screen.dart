@@ -11,7 +11,7 @@ class ProfilePage extends StatelessWidget {
     bool isDarkMode = themeNotifier.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Color(0xFF121212) : Colors.white, // Background color for dark/light mode
+      backgroundColor: isDarkMode ? Color(0xFF242424) : Colors.white, // Background color for dark/light mode
       body: Column(
         children: [
           Container(

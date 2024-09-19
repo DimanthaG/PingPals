@@ -73,7 +73,7 @@ class _NavBarState extends State<NavBar> {
         },
         elevation: 10,
         backgroundColor:
-            widget.themeNotifier.isDarkMode ? Colors.black : Colors.white,
+            widget.themeNotifier.isDarkMode ? Color(0xFF242424) : Colors.white,
       ),
     );
   }

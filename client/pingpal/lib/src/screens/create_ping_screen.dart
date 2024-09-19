@@ -107,7 +107,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 .colorScheme.onPrimary, // Ensures the text color contrasts well
           ),
         ),
-        backgroundColor: Colors.yellow[700], // Change the color to yellow
+        backgroundColor: const Color.fromARGB(0, 251, 193, 45), // Change the color to yellow
         elevation: 0,
         centerTitle: true,
       ),
@@ -136,8 +136,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                       contentPadding:
                           EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                      filled: true,
-                      fillColor: fillColor,
+                      filled: false,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -508,17 +507,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: Color.fromARGB(0,0,0,0),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
+            color: const Color.fromARGB(0, 0, 0, 0),
+            blurRadius: 0,
             offset: Offset(0, 5),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(10.0),
       child: child,
     );
   }

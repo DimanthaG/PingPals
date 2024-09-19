@@ -24,13 +24,13 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   // List of events with dark mode colors
   final List<Map<String, dynamic>> _events = [
-    {'title': 'Deal!', 'subtitle': 'Geeneth Kulatunge', 'time': 'in 12:22', 'color': Color(0xFFFFA400)}, // Created (Orange)
-    {'title': 'QuickWit', 'subtitle': 'Roosanda', 'time': 'in 1:30:12', 'color': Color(0xFFF37A90)}, // Invited (Pink)
-    {'title': 'Minecraft', 'subtitle': 'DimanthaG', 'time': 'in 20:32', 'color': Color(0xFFFFA400)}, // Created (Orange)
-    {'title': 'Deal!', 'subtitle': 'Geeneth Kulatunge', 'time': 'in 12:22', 'color': Color(0xFFFFA400)}, // Created (Orange)
-    {'title': 'QuickWit', 'subtitle': 'Roosanda', 'time': 'in 1:30:12', 'color': Color(0xFFF37A90)}, // Invited (Pink)
-    {'title': 'Accepted Event', 'subtitle': 'PersonA', 'time': 'in 0:45:10', 'color': Color(0xFF6ECF68)}, // Accepted (Green)
-    {'title': 'Declined Event', 'subtitle': 'PersonB', 'time': 'in 3:15:45', 'color': Color(0xFFD95555)}, // Declined (Red)
+    {'title': 'Deal!', 'subtitle': 'Geeneth Kulatunge', 'time': 'in 12:22', 'color': Color(0xFFFFA400), 'dark':Color(0xFFFFBF71)}, // Created (Orange)
+    {'title': 'QuickWit', 'subtitle': 'Roosanda', 'time': 'in 1:30:12', 'color': Color(0xFFF37A90),'dark':Color(0xFFFFBF71)}, // Invited (Pink)
+    {'title': 'Minecraft', 'subtitle': 'DimanthaG', 'time': 'in 20:32', 'color': Color(0xFFFFA400),'dark':Color(0xFFFFBF71)}, // Created (Orange)
+    {'title': 'Deal!', 'subtitle': 'Geeneth Kulatunge', 'time': 'in 12:22', 'color': Color(0xFFFFA400),'dark':Color(0xFFFFBF71)}, // Created (Orange)
+    {'title': 'QuickWit', 'subtitle': 'Roosanda', 'time': 'in 1:30:12', 'color': Color(0xFFF37A90),'dark':Color(0xFFFFBF71)}, // Invited (Pink)
+    {'title': 'Accepted Event', 'subtitle': 'PersonA', 'time': 'in 0:45:10', 'color': Color(0xFF6ECF68),'dark':Color(0xFFFFBF71)}, // Accepted (Green)
+    {'title': 'Declined Event', 'subtitle': 'PersonB', 'time': 'in 3:15:45', 'color': Color(0xFFD95555),'dark':Color(0xFFFFBF71)}, // Declined (Red)
   ];
 
   // Variable to store the currently selected filter color
@@ -38,13 +38,18 @@ class _EventsPageState extends State<EventsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     // Filtered events based on selected filter color
     List<Map<String, dynamic>> _filteredEvents = _selectedFilterColor == null
         ? _events
         : _events.where((event) => event['color'] == _selectedFilterColor).toList();
 
+    
     return Scaffold(
-      backgroundColor: Color(0xFF1C1C1E),  // Dark background color
+      backgroundColor:             
+        isDarkMode ? Color(0xFF242424) : Colors.white,
+  // Dark background color
       body: Column(
         children: [
           // Top blue section with rounded bottom corners and "Events" title
@@ -56,7 +61,7 @@ class _EventsPageState extends State<EventsPage> {
                 bottomRight: Radius.circular(20),
               ),
             ),
-            padding: EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+            padding: EdgeInsets.only(top: 60, left: 16, right: 16, bottom: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -95,10 +100,10 @@ class _EventsPageState extends State<EventsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildFilterButton('Created', Color(0xFFFFA400)), // Orange
-                    _buildFilterButton('Invited', Color(0xFFF37A90)), // Pink
-                    _buildFilterButton('Accepted', Color(0xFF6ECF68)), // Green
-                    _buildFilterButton('Declined', Color(0xFFD95555)), // Red
+                    _buildFilterButton('Created', isDarkMode ? Color(0xFFFFA400):Color(0xFFFF6818)), // Orange
+                    _buildFilterButton('Invited', isDarkMode ? Color(0xFFF37A90):Color(0xFFFF4486)), // Pink
+                    _buildFilterButton('Accepted', isDarkMode ? Color(0xFF6ECF68):Color(0xFF00AE51)), // Green
+                    _buildFilterButton('Declined', isDarkMode ? Color(0xFFD95555):Color(0xFFCE4141)), // Red
                   ],
                 ),
               ],
@@ -163,6 +168,7 @@ class _EventsPageState extends State<EventsPage> {
         color: color,
         borderRadius: BorderRadius.circular(20),
       ),
+    
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,  // Ensure alignment

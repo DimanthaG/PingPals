@@ -20,17 +20,21 @@ class _PalsScreenState extends State<PalsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        
         title: Text(
           'Pals',
+          textAlign: TextAlign.left,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onPrimary,
+            color: isDarkMode ? Colors.white : Colors.black,
+              
           ),
         ),
+        
         backgroundColor:
-            isDarkMode ? const Color(0xFFFF8C00) : const Color(0xFFFFC800),
+            isDarkMode ? const Color.fromARGB(0, 255, 140, 0) : const Color.fromARGB(0, 255, 200, 0),
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         actions: [
           _buildSortMenu(theme),
         ],
