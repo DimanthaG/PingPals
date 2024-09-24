@@ -10,18 +10,16 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/logo.png', // Ensure the path is correct
-              height: 300, // Adjust the height as needed
-            )
-          ],
+        title: Text(
+          'PingPals!',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onPrimary,
+          ),
         ),
         backgroundColor: isDarkMode
-            ? const Color.fromARGB(0, 0, 0, 0) // Dark Mode Orange
-            : const Color.fromARGB(0, 0, 0, 0), // Light Mode Yellow
+            ? const Color(0xFFFF8C00) // Dark Mode Orange
+            : const Color(0xFFFF8C00), // Light Mode Yellow
         elevation: 0,
         centerTitle: true,
       ),
@@ -203,9 +201,13 @@ class HomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? Color(0xFF3A58F3)
-                        : Color(0xFF3A58F3),
+                  gradient: LinearGradient(
+                    colors: isDarkMode
+                        ? [Color(0xFF5E35B1), Color(0xFFBA68C8)]
+                        : [Color(0xFF6A1B9A), Color(0xFFBA68C8)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),

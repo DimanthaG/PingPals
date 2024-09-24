@@ -10,7 +10,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: EventsPage(),
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Color(0xFF1C1C1E),  // Dark background color
+        scaffoldBackgroundColor:
+            const Color(0xFF1C1C1E), // Dark background color
       ),
     );
   }
@@ -24,13 +25,48 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   // List of events with dark mode colors
   final List<Map<String, dynamic>> _events = [
-    {'title': 'Deal!', 'subtitle': 'Geeneth Kulatunge', 'time': 'in 12:22', 'color': Color(0xFFFFA400), 'dark':Color(0xFFFFBF71)}, // Created (Orange)
-    {'title': 'QuickWit', 'subtitle': 'Roosanda', 'time': 'in 1:30:12', 'color': Color(0xFFF37A90),'dark':Color(0xFFFFBF71)}, // Invited (Pink)
-    {'title': 'Minecraft', 'subtitle': 'DimanthaG', 'time': 'in 20:32', 'color': Color(0xFFFFA400),'dark':Color(0xFFFFBF71)}, // Created (Orange)
-    {'title': 'Deal!', 'subtitle': 'Geeneth Kulatunge', 'time': 'in 12:22', 'color': Color(0xFFFFA400),'dark':Color(0xFFFFBF71)}, // Created (Orange)
-    {'title': 'QuickWit', 'subtitle': 'Roosanda', 'time': 'in 1:30:12', 'color': Color(0xFFF37A90),'dark':Color(0xFFFFBF71)}, // Invited (Pink)
-    {'title': 'Accepted Event', 'subtitle': 'PersonA', 'time': 'in 0:45:10', 'color': Color(0xFF6ECF68),'dark':Color(0xFFFFBF71)}, // Accepted (Green)
-    {'title': 'Declined Event', 'subtitle': 'PersonB', 'time': 'in 3:15:45', 'color': Color(0xFFD95555),'dark':Color(0xFFFFBF71)}, // Declined (Red)
+    {
+      'title': 'Deal!',
+      'subtitle': 'Geeneth Kulatunge',
+      'time': 'in 12:22',
+      'color': const Color(0xFFFFA400)
+    }, // Created (Orange)
+    {
+      'title': 'QuickWit',
+      'subtitle': 'Roosanda',
+      'time': 'in 1:30:12',
+      'color': const Color(0xFFF37A90)
+    }, // Invited (Pink)
+    {
+      'title': 'Minecraft',
+      'subtitle': 'DimanthaG',
+      'time': 'in 20:32',
+      'color': const Color(0xFFFFA400)
+    }, // Created (Orange)
+    {
+      'title': 'Deal!',
+      'subtitle': 'Geeneth Kulatunge',
+      'time': 'in 12:22',
+      'color': const Color(0xFFFFA400)
+    }, // Created (Orange)
+    {
+      'title': 'QuickWit',
+      'subtitle': 'Roosanda',
+      'time': 'in 1:30:12',
+      'color': const Color(0xFFF37A90)
+    }, // Invited (Pink)
+    {
+      'title': 'Accepted Event',
+      'subtitle': 'PersonA',
+      'time': 'in 0:45:10',
+      'color': const Color(0xFF6ECF68)
+    }, // Accepted (Green)
+    {
+      'title': 'Declined Event',
+      'subtitle': 'PersonB',
+      'time': 'in 3:15:45',
+      'color': const Color(0xFFD95555)
+    }, // Declined (Red)
   ];
 
   // Variable to store the currently selected filter color
@@ -38,36 +74,34 @@ class _EventsPageState extends State<EventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     // Filtered events based on selected filter color
     List<Map<String, dynamic>> _filteredEvents = _selectedFilterColor == null
         ? _events
-        : _events.where((event) => event['color'] == _selectedFilterColor).toList();
+        : _events
+            .where((event) => event['color'] == _selectedFilterColor)
+            .toList();
 
-    
     return Scaffold(
-      backgroundColor:             
-        isDarkMode ? Color(0xFF242424) : Colors.white,
-  // Dark background color
+      backgroundColor: const Color(0xFF1C1C1E), // Dark background color
       body: Column(
         children: [
           // Top blue section with rounded bottom corners and "Events" title
           Container(
-            decoration: BoxDecoration(
-              color: Color(0xFF3A58F3),
+            decoration: const BoxDecoration(
+              color: const Color(0xFFFF8C00),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
               ),
             ),
-            padding: EdgeInsets.only(top: 60, left: 16, right: 16, bottom: 16),
+            padding:
+                const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Padding above "Events"
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 16.0, top: 8.0),
                   child: Center(
                     child: Text(
                       'Events',
@@ -82,28 +116,33 @@ class _EventsPageState extends State<EventsPage> {
                 // Search bar
                 TextField(
                   decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     filled: true,
                     fillColor: Colors.white,
-                    prefixIcon: Icon(Icons.search, color: Colors.black54),
+                    prefixIcon: const Icon(Icons.search, color: Colors.black54),
                     hintText: 'Search...',
-                    hintStyle: TextStyle(color: Colors.black54, fontSize: 16),
+                    hintStyle:
+                        const TextStyle(color: Colors.black54, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 // Filter chips
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildFilterButton('Created', isDarkMode ? Color(0xFFFFA400):Color(0xFFFF6818)), // Orange
-                    _buildFilterButton('Invited', isDarkMode ? Color(0xFFF37A90):Color(0xFFFF4486)), // Pink
-                    _buildFilterButton('Accepted', isDarkMode ? Color(0xFF6ECF68):Color(0xFF00AE51)), // Green
-                    _buildFilterButton('Declined', isDarkMode ? Color(0xFFD95555):Color(0xFFCE4141)), // Red
+                    _buildFilterButton(
+                        'Created', const Color(0xFFFFA400)), // Orange
+                    _buildFilterButton(
+                        'Invited', const Color(0xFFF37A90)), // Pink
+                    _buildFilterButton(
+                        'Accepted', const Color(0xFF6ECF68)), // Green
+                    _buildFilterButton(
+                        'Declined', const Color(0xFFD95555)), // Red
                   ],
                 ),
               ],
@@ -112,7 +151,7 @@ class _EventsPageState extends State<EventsPage> {
           // Event cards list
           Expanded(
             child: ListView(
-              padding: EdgeInsets.only(top: 8, bottom: 8),
+              padding: const EdgeInsets.only(top: 8, bottom: 8),
               children: _filteredEvents.map((event) {
                 return _buildEventCard(
                   event['title'],
@@ -141,15 +180,17 @@ class _EventsPageState extends State<EventsPage> {
         });
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(20),
-          border: _selectedFilterColor == color ? Border.all(color: Colors.white, width: 2) : null,
+          border: _selectedFilterColor == color
+              ? Border.all(color: Colors.white, width: 2)
+              : null,
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 12,
             fontWeight: FontWeight.bold,
@@ -167,13 +208,20 @@ class _EventsPageState extends State<EventsPage> {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
-    
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,  // Ensure alignment
+        crossAxisAlignment: CrossAxisAlignment.start, // Align vertically
         children: [
-          Expanded(  // Ensures the text doesn't overflow the container
+          Expanded(
+            // Expands text without overflow
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -182,38 +230,45 @@ class _EventsPageState extends State<EventsPage> {
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontSize: 20,
                   ),
                 ),
                 SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.white.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),
-                SizedBox(height: 12),
-                Row(
+                SizedBox(height: 10),
+                // Avatars for participants
+                Wrap(
+                  spacing: 8.0, // Space between avatars
+                  runSpacing: 8.0,
                   children: [
                     _buildAvatar('Nethma'),
                     _buildAvatar('Amantha'),
                     _buildAvatar('Dimantha'),
                     _buildAvatar('Hakkam'),
+                    _buildAvatarOverflow(2), // Indicates more participants
                   ],
                 ),
               ],
             ),
           ),
-          SizedBox(width: 8),  // Add some spacing between text and time
-          Text(
-            time,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          SizedBox(width: 8), // Spacing between text and time
+          // Right-side time display
+          Flexible(
+            child: Text(
+              time,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.right,
             ),
-            textAlign: TextAlign.right,  // Align time text to the right
           ),
         ],
       ),
@@ -221,21 +276,29 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   Widget _buildAvatar(String name) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: Colors.white,
+      child: Text(
+        name[0], // Display first initialr
+        style: TextStyle(
+          color: Colors.black87,
+          fontWeight: FontWeight.bold,
         ),
-        child: Text(
-          name,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildAvatarOverflow(int extraCount) {
+    return CircleAvatar(
+      radius: 16,
+      backgroundColor: Colors.white.withOpacity(0.6),
+      child: Text(
+        '+$extraCount', // Indicate extra participants
+        style: TextStyle(
+          color: Colors.black87,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
         ),
       ),
     );
