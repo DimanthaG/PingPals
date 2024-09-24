@@ -34,7 +34,8 @@ public class EventUserService {
         if (updatedEventUserData.getUserId() != null) existingEventUser.setUserId(updatedEventUserData.getUserId());
         if (updatedEventUserData.getRole() != null) existingEventUser.setRole(updatedEventUserData.getRole());
         if (updatedEventUserData.getStatus() != null) existingEventUser.setStatus(updatedEventUserData.getStatus());
-        if (updatedEventUserData.getJoinedAt() != null) existingEventUser.setJoinedAt(updatedEventUserData.getJoinedAt());
+        if (updatedEventUserData.getJoinedAt() != null)
+            existingEventUser.setJoinedAt(updatedEventUserData.getJoinedAt());
 
         return eventUserRepository.save(existingEventUser);
     }
@@ -46,7 +47,7 @@ public class EventUserService {
         return existingEventUser;
     }
 
-    public EventUser joinEvent(String eventId){
+    public EventUser joinEvent(String eventId) {
         return eventUserRepository.save(new EventUser(null, eventId, "memberUserId", Role.PARTICIPANT, Status.ACCEPTED, LocalDateTime.now()));
     }
 
@@ -64,5 +65,15 @@ public class EventUserService {
 
     public List<EventUser> getEventUsersForUser(String userId) {
         return eventUserRepository.findByUserId(userId);
+    }
+
+    public EventUser joinEvent(String eventId, String userId) {
+        return eventUserRepository.save(new EventUser(null, eventId, userId, Role.PARTICIPANT, Status.ACCEPTED, LocalDateTime.now()));
+    }
+
+    public void leaveEvent(String eventId, String userId) {
+        EventUser eventUser = eventUserRepository.findByEventIdAndUserId(eventId, userId)
+                .orElseThrow(() -> new RuntimeException("EventUser not found for eventId: " + eventId + " and userId: " + userId));
+        eventUserRepository.delete(eventUser);
     }
 }

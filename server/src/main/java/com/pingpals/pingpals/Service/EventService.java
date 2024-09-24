@@ -56,4 +56,5 @@ public class EventService {
         eventRepository.delete(existingEvent);
         return existingEvent;
     }
+    
 }
