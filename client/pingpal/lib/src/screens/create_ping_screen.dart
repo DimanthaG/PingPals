@@ -31,12 +31,27 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   int _selectedLocationType = 0; // 0 for Discord, 1 for Google Maps, 2 for Zoom
 
+  // Declare isDarkMode as a class variable
+  late bool isDarkMode;
+
   void _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
+      builder: (context, child) {
+        // Ensures the date picker adapts to the theme
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Theme.of(context).colorScheme.primary,
+                  onSurface: Theme.of(context).colorScheme.onSurface,
+                ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (pickedDate != null) {
       setState(() {
@@ -52,6 +67,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       initialTime: isStartTime
           ? (_selectedStartTime ?? TimeOfDay.now())
           : (_selectedEndTime ?? TimeOfDay.now()),
+      builder: (context, child) {
+        // Ensures the time picker adapts to the theme
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Theme.of(context).colorScheme.primary,
+                  onSurface: Theme.of(context).colorScheme.onSurface,
+                ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (pickedTime != null) {
       setState(() {
@@ -92,22 +119,24 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final fillColor = isDarkMode ? Color(0xFF3A3D5C) : Colors.white;
-    final hintColor = theme.textTheme.labelSmall?.color ?? Colors.grey;
+    isDarkMode = theme.brightness == Brightness.dark;
+    final fillColor = isDarkMode ? Color(0xFF1E1E1E) : Colors.white;
+    final cardColor = isDarkMode ? Color(0xFF2A2A2A) : Colors.white;
+    final hintColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final dividerColor = isDarkMode ? Colors.grey[700]! : Colors.grey[300]!;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'PingPals!',
+          'Create Ping',
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: theme
-                .colorScheme.onPrimary, // Ensures the text color contrasts well
+            color: theme.colorScheme.onPrimary,
           ),
         ),
-        backgroundColor: const Color.fromARGB(0, 251, 193, 45), // Change the color to yellow
+        backgroundColor: const Color(0xFFFF8C00),
         elevation: 0,
         centerTitle: true,
       ),
@@ -122,9 +151,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 // Title input with rounded edges and border
                 _buildFullWidthCard(
                   theme,
+                  cardColor,
                   child: TextFormField(
                     controller: _titleController,
-                    style: theme.textTheme.headlineSmall,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: textColor,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Event Title',
                       hintStyle: TextStyle(
@@ -136,7 +168,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                       contentPadding:
                           EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                      filled: false,
+                      filled: true,
+                      fillColor: fillColor,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -151,23 +184,22 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 // Event Description
                 _buildFullWidthCard(
                   theme,
+                  cardColor,
                   child: TextFormField(
                     controller: _descriptionController,
                     maxLines: 2,
-                    style: theme.textTheme.bodyMedium,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: textColor,
+                    ),
                     decoration: InputDecoration(
                       labelText: 'Event Description',
                       labelStyle: TextStyle(
-                        color: theme.textTheme.bodySmall?.color,
+                        color: hintColor,
                       ),
                       hintStyle: TextStyle(
                         color: hintColor,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
@@ -189,6 +221,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   'Event Location',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -209,6 +242,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 if (_selectedLocationType == 0) ...[
                   _buildFullWidthCard(
                     theme,
+                    cardColor,
                     child: TextFormField(
                       controller: _discordServerNameController,
                       decoration: InputDecoration(
@@ -220,14 +254,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
                         filled: true,
                         fillColor: fillColor,
                       ),
-                      style: theme.textTheme.bodyMedium,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: textColor,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -235,6 +267,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
                 _buildFullWidthCard(
                   theme,
+                  cardColor,
                   child: TextFormField(
                     controller: _selectedLocationType == 0
                         ? _discordServerController
@@ -254,14 +287,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
                       filled: true,
                       fillColor: fillColor,
                     ),
-                    style: theme.textTheme.bodyMedium,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: textColor,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -269,6 +300,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 // Time and Capacity
                 _buildFullWidthCard(
                   theme,
+                  cardColor,
                   child: Row(
                     children: [
                       Expanded(
@@ -288,10 +320,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                               Icons.access_time,
                               color: theme.iconTheme.color,
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
                             filled: true,
                             fillColor: fillColor,
                           ),
@@ -303,7 +331,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             }
                             return null;
                           },
-                          style: theme.textTheme.bodyMedium,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: textColor,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -311,6 +341,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         'to',
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -331,10 +362,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                               Icons.access_time,
                               color: theme.iconTheme.color,
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
                             filled: true,
                             fillColor: fillColor,
                           ),
@@ -346,7 +373,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             }
                             return null;
                           },
-                          style: theme.textTheme.bodyMedium,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: textColor,
+                          ),
                         ),
                       ),
                     ],
@@ -359,18 +388,22 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   'Capacity',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 10),
                 _buildFullWidthCard(
                   theme,
+                  cardColor,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
                           '$_capacity',
-                          style: theme.textTheme.bodyLarge,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: textColor,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -399,32 +432,37 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   'Invite Pals',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 10),
                 _buildFullWidthCard(
                   theme,
+                  cardColor,
                   child: Container(
                     height: 300,
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: theme.dividerColor),
-                    ),
                     child: ListView(
                       children: [
-                        _buildFriendChip('Dimantha', theme, isDarkMode,
+                        _buildFriendChip(
+                            'Dimantha', theme, isDarkMode, dividerColor,
                             accepted: true),
-                        _buildFriendChip('Nethma', theme, isDarkMode),
-                        _buildFriendChip('Amantha', theme, isDarkMode,
+                        _buildFriendChip(
+                            'Nethma', theme, isDarkMode, dividerColor),
+                        _buildFriendChip(
+                            'Amantha', theme, isDarkMode, dividerColor,
                             accepted: true),
-                        _buildFriendChip('Hakkam', theme, isDarkMode),
-                        _buildFriendChip('Roosanda', theme, isDarkMode,
+                        _buildFriendChip(
+                            'Hakkam', theme, isDarkMode, dividerColor),
+                        _buildFriendChip(
+                            'Roosanda', theme, isDarkMode, dividerColor,
                             accepted: true),
-                        _buildFriendChip('Sheveen', theme, isDarkMode),
-                        _buildFriendChip('Adheeb', theme, isDarkMode),
-                        _buildFriendChip('Thulana', theme, isDarkMode),
+                        _buildFriendChip(
+                            'Sheveen', theme, isDarkMode, dividerColor),
+                        _buildFriendChip(
+                            'Adheeb', theme, isDarkMode, dividerColor),
+                        _buildFriendChip(
+                            'Thulana', theme, isDarkMode, dividerColor),
                       ],
                     ),
                   ),
@@ -436,9 +474,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   child: ElevatedButton(
                     onPressed: _createEvent,
                     style: ElevatedButton.styleFrom(
-                      foregroundColor:
-                          Colors.black, // Black text on yellow button
-                      backgroundColor: Colors.yellow[700], // Yellow button
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.yellow[700],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -452,8 +489,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color:
-                            Colors.black, // Ensure text on the button is black
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -466,22 +502,27 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  Widget _buildFriendChip(String name, ThemeData theme, bool isDarkMode,
+  Widget _buildFriendChip(
+      String name, ThemeData theme, bool isDarkMode, Color dividerColor,
       {bool accepted = false}) {
+    final chipColor = accepted
+        ? theme.colorScheme.secondary.withOpacity(0.2)
+        : (isDarkMode ? Color(0xFF2A2A2A) : theme.cardColor);
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: accepted
-            ? theme.colorScheme.secondary.withOpacity(0.2)
-            : theme.cardColor,
+        color: chipColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.dividerColor),
+        border: Border.all(color: dividerColor),
       ),
       child: Text(
         name,
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.bold,
+          color: textColor,
         ),
       ),
     );
@@ -494,7 +535,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       icon: Icon(icon),
       color: _selectedLocationType == index
           ? theme.colorScheme.secondary
-          : theme.iconTheme.color,
+          : (isDarkMode ? Colors.grey[400] : theme.iconTheme.color),
       onPressed: () {
         setState(() {
           _selectedLocationType = index;
@@ -503,21 +544,29 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  Widget _buildFullWidthCard(ThemeData theme, {required Widget child}) {
+  Widget _buildFullWidthCard(ThemeData theme, Color cardColor,
+      {required Widget child}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Color.fromARGB(0,0,0,0),
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: const Color.fromARGB(0, 0, 0, 0),
-            blurRadius: 0,
-            offset: Offset(0, 5),
-          ),
+          if (!isDarkMode)
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          if (isDarkMode)
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
         ],
       ),
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(16.0),
       child: child,
     );
   }
