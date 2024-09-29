@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'src/widgets/nav_bar.dart';
-import 'theme/theme_notifier.dart';
+import 'package:pingpal/src/widgets/nav_bar.dart';
+import 'package:pingpal/theme/theme_notifier.dart';
+import 'package:pingpal/src/screens/login.dart'; // Import Login Page
+import 'package:pingpal/src/screens/signup.dart'; // Import Sign Up Page
 
 void main() {
   runApp(MyApp());
@@ -17,9 +19,22 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'PingPals',
           theme: themeNotifier.currentTheme,
-          home: NavBar(themeNotifier: themeNotifier),
+          // Set the home to LoginPage
+          home: LoginPage(
+            themeNotifier: themeNotifier,
+            onLoginSuccess: _navigateToMainApp, // Define success login behavior
+          ),
         );
       },
+    );
+  }
+
+  void _navigateToMainApp(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NavBar(themeNotifier: themeNotifier),
+      ),
     );
   }
 }

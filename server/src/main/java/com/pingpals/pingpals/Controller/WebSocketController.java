@@ -27,17 +27,16 @@ public class WebSocketController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/joinEvent/{eventId}")
-    @SendTo("/topic/joinEvent/{eventId}")
-    public List<String> joinEvent(@PathVariable String eventId) {
-        eventUserService.joinEvent(eventId);
+    @MessageMapping("/getParticipants/{eventId}")
+    @SendTo("/topic/participants/{eventId}")
+    public List<String> getParticipants(@PathVariable String eventId) {
         List<EventUser> participants = eventUserService.getEventUsersForEvent(eventId);
         List<String> userIds = participants.stream()
-                .map(EventUser::getUserId)
-                .collect(Collectors.toList());
+            .map(EventUser::getUserId)
+            .collect(Collectors.toList());
 
         return userIds;
-    }
+}
 
     @MessageMapping("/joinEvent/{eventId}")
     @SendTo("/topic/event/{eventId}")
