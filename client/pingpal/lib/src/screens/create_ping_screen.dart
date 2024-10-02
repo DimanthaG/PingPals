@@ -93,28 +93,67 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  void _createEvent() {
-    if (_formKey.currentState!.validate()) {
-      final event = Event(
-        title: _titleController.text,
-        date: DateTime(
-          _selectedDate!.year,
-          _selectedDate!.month,
-          _selectedDate!.day,
-        ),
-        location: _selectedLocationType == 0
-            ? '${_discordServerNameController.text}: ${_discordServerController.text}'
+void _createEvent() async {
+  if (_formKey.currentState!.validate()) {
+    final event = {
+      'title': _titleController.text,
+      'description': _descriptionController.text,
+      'startTime': DateTime(
+        _selectedDate!.year,
+        _selectedDate!.month,
+        _selectedDate!.day,
+        _selectedStartTime!.hour,
+        _selectedStartTime!.minute,
+      ).toIso8601String(),
+      'endTime': DateTime(
+        _selectedDate!.year,
+        _selectedDate!.month,
+        _selectedDate!.day,
+        _selectedEndTime!.hour,
+        _selectedEndTime!.minute,
+      ).toIso8601String(),
+      'location': {
+        'platform': _selectedLocationType == 0
+            ? 'Discord'
+            : _selectedLocationType == 1
+                ? 'Google Maps'
+                : 'Zoom',
+        'link': _selectedLocationType == 0
+            ? _discordServerController.text
             : _selectedLocationType == 1
                 ? _googleMapsLinkController.text
                 : _zoomRoomController.text,
-        description: _descriptionController.text,
+        'details': _selectedLocationType == 0
+            ? _discordServerNameController.text
+            : null,
+      },
+      'capacity': _capacity,
+      'open': true,
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/addEvent'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(event),
       );
-      // Handle event creation logic here
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Event "${_titleController.text}" created!')),
+        );
+      } else {
+        throw Exception('Failed to create event');
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Event "${event.title}" created!')),
+        SnackBar(content: Text('Failed to create event: $e')),
       );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
