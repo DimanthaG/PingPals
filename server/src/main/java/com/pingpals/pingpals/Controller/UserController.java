@@ -2,6 +2,8 @@ package com.pingpals.pingpals.Controller;
 
 import com.pingpals.pingpals.Model.User;
 import com.pingpals.pingpals.Repository.UserRepository;
+import com.pingpals.pingpals.Service.FriendRequestService;
+import com.pingpals.pingpals.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,8 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserService userService;
 
     @PostMapping("/addUser")
     public void addUser(@RequestBody User user) {
@@ -28,6 +32,12 @@ public class UserController {
     @GetMapping("/getAllUsers")
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @GetMapping("/removeFriend/{friendUsername}")
+    public void removeFriend(@PathVariable String friendUsername) {
+        //TODO: Replace User with Authenticated Current User
+        userService.removeFriend("userId", friendUsername);
     }
 
 }
