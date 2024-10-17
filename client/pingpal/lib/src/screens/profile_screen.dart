@@ -1,3 +1,5 @@
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pingpal/theme/theme_notifier.dart';
 
@@ -20,7 +22,6 @@ class ProfilePage extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
               children: [
-                // Stat Cards
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -30,16 +31,11 @@ class ProfilePage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16.0),
-
-                // Upgrade to Premium Section
                 _buildPremiumTile(),
-
                 const SizedBox(height: 16.0),
-
-                // Options
                 _buildSwitchTile('Change Theme', themeNotifier, isDarkMode),
                 _buildOptionTile('Blocked List', Icons.block, isDarkMode),
-                _buildLogoutTile(isDarkMode),
+                _buildLogoutTile(isDarkMode, context),
               ],
             ),
           ),
@@ -48,7 +44,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Profile Header with improvements
   Widget _buildProfileHeader(bool isDarkMode) {
     return Container(
       width: double.infinity,
@@ -97,7 +92,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Premium Tile with more engaging design
   Widget _buildPremiumTile() {
     return Container(
       width: double.infinity,
@@ -137,7 +131,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Stat Card with a modern design
   Widget _buildStatCard(String title, String count, Color color) {
     return Container(
       width: 140,
@@ -178,7 +171,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Option Tile with icons
   Widget _buildOptionTile(String title, IconData icon, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -206,7 +198,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Theme Switch Tile
   Widget _buildSwitchTile(
       String title, ThemeNotifier themeNotifier, bool isDarkMode) {
     return Padding(
@@ -240,8 +231,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Logout Tile with enhanced visuals
-  Widget _buildLogoutTile(bool isDarkMode) {
+  Widget _buildLogoutTile(bool isDarkMode, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
@@ -259,10 +249,31 @@ class ProfilePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
-        onTap: () {
-          // Handle logout logic
+        onTap: () async {
+          await _handleLogout(context);
         },
       ),
     );
+  }
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final GoogleSignIn _googleSignIn = GoogleSignIn();
+    final FlutterSecureStorage _storage = FlutterSecureStorage();
+
+    try {
+      // Sign out from Google
+      await _googleSignIn.signOut();
+
+      // Clear stored tokens or user data
+      await _storage.deleteAll();
+
+      // Navigate to the login screen and remove all previous routes
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    } catch (error) {
+      print('Logout failed: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logout failed. Please try again.')),
+      );
+    }
   }
 }

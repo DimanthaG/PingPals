@@ -1,126 +1,158 @@
 import 'package:flutter/material.dart';
-import 'package:pingpal/src/screens/signup.dart';
 import 'package:pingpal/theme/theme_notifier.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   final ThemeNotifier themeNotifier;
-  final void Function(BuildContext) onLoginSuccess; // Pass navigation callback
+  final void Function(BuildContext) onLoginSuccess;
 
   LoginPage({required this.themeNotifier, required this.onLoginSuccess});
 
   @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  late bool isDarkMode;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
+  final FlutterSecureStorage secureStorage =
+      FlutterSecureStorage(); // Secure storage instance
+
+  @override
+  void initState() {
+    super.initState();
+    isDarkMode = widget.themeNotifier.isDarkMode;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    bool isDarkMode = themeNotifier.isDarkMode;
     final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: isDarkMode ? Color(0xFF121212) : Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'PingPals!',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color:
-                    isDarkMode ? Colors.orangeAccent : const Color(0xFFFF8C00),
-              ),
-            ),
-            const SizedBox(height: 32.0),
-            _buildTextField(
-              context: context,
-              labelText: 'Email',
-              icon: Icons.email,
-              isDarkMode: isDarkMode,
-            ),
-            const SizedBox(height: 16.0),
-            _buildTextField(
-              context: context,
-              labelText: 'Password',
-              icon: Icons.lock,
-              isDarkMode: isDarkMode,
-              obscureText: true,
-            ),
-            const SizedBox(height: 32.0),
-            _buildLoginButton(context, theme, isDarkMode),
-            const SizedBox(height: 16.0),
-            GestureDetector(
-              onTap: () {
-                // Navigate to the SignUp page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        SignUpPage(themeNotifier: themeNotifier),
-                  ),
-                );
-              },
-              child: Text(
-                "Don't have an account? Sign up",
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'PingPals',
                 style: TextStyle(
-                  color: isDarkMode ? Colors.white70 : Colors.black54,
-                  fontSize: 16,
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.orangeAccent : Color(0xFFFF8C00),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 40),
+              SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(child: Divider()),
+                  SizedBox(width: 10),
+                  Text(
+                    'OR',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(child: Divider()),
+                ],
+              ),
+              SizedBox(height: 20),
+              _buildGoogleSignInButton(),
+              SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField({
-    required BuildContext context,
-    required String labelText,
-    required IconData icon,
-    bool isDarkMode = false,
-    bool obscureText = false,
-  }) {
-    return TextField(
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: isDarkMode ? Color(0xFF424242) : Colors.grey[200],
-        labelText: labelText,
-        prefixIcon:
-            Icon(icon, color: isDarkMode ? Colors.white70 : Colors.black54),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0),
-          borderSide: BorderSide.none,
-        ),
-        labelStyle:
-            TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
-      ),
-    );
-  }
-
-  Widget _buildLoginButton(
-      BuildContext context, ThemeData theme, bool isDarkMode) {
+  Widget _buildGoogleSignInButton() {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          // Perform login logic and on success, navigate to the main app
-          onLoginSuccess(context); // Use the callback to navigate
-        },
+      child: ElevatedButton.icon(
+        onPressed: _handleGoogleSignIn,
+        icon: Image.asset(
+          'assets/google_logo.png',
+          height: 24.0,
+          width: 24.0,
+        ),
+        label: Text(
+          'Sign in with Google',
+          style: TextStyle(fontSize: 18.0),
+        ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFF8C00),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black54,
           padding: const EdgeInsets.symmetric(vertical: 16.0),
+          alignment: Alignment.center,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
-          ),
-        ),
-        child: const Text(
-          'Login',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
+            side: BorderSide(color: Colors.grey.shade400),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      GoogleSignInAccount? account = await _googleSignIn.signIn();
+      if (account != null) {
+        GoogleSignInAuthentication auth = await account.authentication;
+        String? idToken = auth.idToken;
+
+        // Send the ID token to your server for verification
+        await _authenticateWithServer(idToken!);
+
+        widget.onLoginSuccess(context);
+      }
+    } catch (error) {
+      print('Google Sign-In error: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-In failed. Please try again.')),
+      );
+    }
+  }
+
+  Future<void> _authenticateWithServer(String idToken) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/auth/google'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'idToken': idToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        String accessToken = responseData['accessToken'];
+        String refreshToken = responseData['refreshToken'];
+
+        // Store both the access and refresh tokens securely
+        await secureStorage.write(key: 'jwtToken', value: accessToken);
+        await secureStorage.write(key: 'refreshToken', value: refreshToken);
+
+        print('Tokens saved successfully');
+      } else {
+        print('Server responded with status code ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Authentication failed. Please try again.')),
+        );
+      }
+    } catch (e) {
+      print('Error authenticating with server: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred. Please try again.')),
+      );
+    }
   }
 }
