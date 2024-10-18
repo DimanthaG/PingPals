@@ -6,14 +6,13 @@ import com.pingpals.pingpals.Model.User;
 import com.pingpals.pingpals.Repository.FriendRequestRepository;
 import com.pingpals.pingpals.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.web.servlet.View;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FriendRequestService {
@@ -25,17 +24,21 @@ public class FriendRequestService {
     @Autowired
     private View error;
 
-    public void createFriendRequest(String username) {
-        if (username == null || username.isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
+    public void createFriendRequest(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
         }
         try {
-            User receiver = userRepository.findByUsername(username)
+            User receiver = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Receiver not found"));
+
+            // Get the authenticated user's ID
+            String authenticatedUserId = getAuthenticatedUserId();
+
             friendRequestRepository.save(
                     new FriendRequest(
                             null,
-                            "authenticated user",
+                            authenticatedUserId,
                             receiver.getId(),
                             LocalDateTime.now(),
                             FriendRequestStatus.PENDING
@@ -92,6 +95,15 @@ public class FriendRequestService {
         } catch (Exception error) {
             throw error;
         }
+    }
+
+    private String getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User is not authenticated");
+        }
+        String userId = authentication.getName(); // The user ID is set as the principal
+        return userId;
     }
 
 }
