@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document
+@Document(collection = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,11 +18,13 @@ public class User {
     @Id
     private String id;
 
+    // Unique identifier from Google
     @Indexed(unique = true)
-    private String username;
+    private String googleId;
 
-    private String password;
+    private String email;
+    private String name;
+    private String pictureUrl;
 
     private List<String> friends;
-
 }
