@@ -16,34 +16,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    // Inject the JWT secret from application.properties
     @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF (Cross-Site Request Forgery)
-                .csrf(csrf -> csrf.disable())
-                // Set session management to stateless
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Set permissions on endpoints
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless JWT auth
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Set session to stateless
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/google").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/auth/google").permitAll() // Allow access to Google auth without JWT
+                        .requestMatchers("/searchUsers").authenticated() // Require JWT auth for searchUsers
+                        .anyRequest().authenticated() // Protect other endpoints
                 )
-                // Add JWT Token Filter
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Add JWT filter
 
         return http.build();
     }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtSecret);
+        return new JwtAuthenticationFilter(jwtSecret); // Your custom JWT filter
     }
 
-    // Provide a bean for AuthenticationManager if needed
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

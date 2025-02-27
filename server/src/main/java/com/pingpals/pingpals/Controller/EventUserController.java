@@ -1,9 +1,7 @@
 package com.pingpals.pingpals.Controller;
 
-import com.pingpals.pingpals.Model.Event;
 import com.pingpals.pingpals.Model.EventUser;
 import com.pingpals.pingpals.Repository.EventUserRepository;
-import com.pingpals.pingpals.Service.EventService;
 import com.pingpals.pingpals.Service.EventUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -59,5 +57,11 @@ public class EventUserController {
     public List<EventUser> getEventUsersForUser(@PathVariable String userId) {
         return eventUserService.getEventUsersForUser(userId);
     }
+
+    @PostMapping("/inviteFriend/{eventId}/{friendId}")
+    public void inviteFriendToEvent(@PathVariable String eventId, @PathVariable String friendId) {
+        eventUserService.inviteFriendToEvent(eventId, friendId);
+    }
+
 
 }

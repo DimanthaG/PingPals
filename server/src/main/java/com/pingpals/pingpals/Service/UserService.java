@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -49,7 +50,7 @@ public class UserService {
                 return user;
             }
         } catch (org.springframework.dao.DuplicateKeyException e) {
-            // Another process may have created the user; retrieve and return it
+
             return userRepository.findByGoogleId(googleId).orElseThrow(() -> e);
         }
     }
@@ -118,4 +119,20 @@ public class UserService {
         userRepository.save(user);
         userRepository.save(friend);
     }
+
+    // Method to search for users by name or email
+    public List<User> searchUsers(String query) {
+        return userRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(query, query);
+    }
+
+
+    public List<User> getFriendsForUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<User> friends = userRepository.findAllById(user.getFriends());
+        return friends;
+    }
+
 }
+
+
