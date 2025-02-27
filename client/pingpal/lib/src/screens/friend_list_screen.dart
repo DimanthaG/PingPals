@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pingpal/src/services/friend_service.dart';
 
 class PalsScreen extends StatefulWidget {
   const PalsScreen({Key? key}) : super(key: key);
@@ -8,21 +9,61 @@ class PalsScreen extends StatefulWidget {
 }
 
 class _PalsScreenState extends State<PalsScreen> {
+  final FriendService _friendService =
+      FriendService(); // Create an instance of FriendService
   String _selectedFilter = 'All';
   String _selectedSort = 'Name';
   bool _isFriendRequestsExpanded = true; // Start expanded
 
-  int _currentIndex = 1; // For BottomNavigationBar, assuming Pals is at index 1
-
+  List<dynamic> _searchResults = []; // Holds the search results
+  List<dynamic> _friendRequests = []; // Holds friend requests
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController =
+      TextEditingController(); // Controller for search input
 
-  Future<void> _refreshPalsList() async {
-    // Simulate network call
-    await Future.delayed(const Duration(seconds: 2));
-    // Update pals list
-    setState(() {
-      // Refresh data
-    });
+  @override
+  void initState() {
+    super.initState();
+    _fetchFriendRequests(); // Fetch friend requests on initialization
+  }
+
+  Future<void> _fetchFriendRequests() async {
+    try {
+      final requests = await _friendService.fetchFriendRequests();
+      setState(() {
+        _friendRequests = requests;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  Future<void> _searchUsers(String query) async {
+    try {
+      final results = await _friendService.searchUsers(query);
+      setState(() {
+        _searchResults = results;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  Future<void> _sendFriendRequest(String email) async {
+    try {
+      await _friendService.sendFriendRequest(email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Friend request sent to $email!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send friend request: $e')),
+      );
+    }
   }
 
   @override
@@ -43,58 +84,31 @@ class _PalsScreenState extends State<PalsScreen> {
             isDarkMode ? const Color(0xFFFF8C00) : const Color(0xFFFF8C00),
         elevation: 0,
         centerTitle: true,
-        actions: [
-          _buildSortMenu(theme),
-        ],
+        actions: [_buildSortMenu(theme)],
       ),
       body: RefreshIndicator(
-        onRefresh: _refreshPalsList,
+        onRefresh: _fetchFriendRequests,
         child: CustomScrollView(
           controller: _scrollController,
           slivers: [
-            // Sticky Search Bar
+            // Search Bar
             SliverPersistentHeader(
               delegate: _SearchBarDelegate(
                 child: _buildSearchBar(theme, isDarkMode),
               ),
               pinned: true,
             ),
-            // Filter Options
-            SliverToBoxAdapter(
-              child: _buildFilterOptions(theme),
-            ),
             // Friend Requests Section
             SliverToBoxAdapter(
               child: _buildFriendRequestsSection(theme),
             ),
-            // Pals List
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return _buildPalCard(
-                    theme,
-                    isDarkMode,
-                    'Pal Name $index',
-                    'Last seen: 2 hours ago',
-                    location: 'Location $index',
-                    accepted: index % 2 == 0,
-                    online: index % 3 == 0,
-                  );
-                },
-                childCount: 10,
-              ),
+            // Search Results Section
+            SliverToBoxAdapter(
+              child: _buildSearchResults(theme),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 80)),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _navigateToFindFriendsPage(context);
-        },
-        label: const Text('Find New Friends'),
-        icon: const Icon(Icons.person_add),
-        backgroundColor: theme.colorScheme.secondary,
       ),
     );
   }
@@ -108,8 +122,9 @@ class _PalsScreenState extends State<PalsScreen> {
         shadowColor: isDarkMode ? Colors.black54 : Colors.black12,
         borderRadius: BorderRadius.circular(30.0),
         child: TextField(
+          controller: _searchController,
           decoration: InputDecoration(
-            hintText: 'Search Pals...',
+            hintText: 'Search for friends...',
             prefixIcon: Icon(Icons.search,
                 color: isDarkMode ? Colors.white54 : Colors.black54),
             filled: true,
@@ -120,51 +135,121 @@ class _PalsScreenState extends State<PalsScreen> {
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
           ),
+          onSubmitted: (query) {
+            _searchUsers(query); // Trigger search when user submits query
+          },
         ),
       ),
     );
   }
 
-  Widget _buildFilterOptions(ThemeData theme) {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.only(left: 16.0),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildFilterChip('All', theme, Icons.all_inclusive),
-          const SizedBox(width: 8),
-          _buildFilterChip('Online', theme, Icons.circle, color: Colors.green),
-          const SizedBox(width: 8),
-          _buildFilterChip('Offline', theme, Icons.circle, color: Colors.grey),
-          // Add more filters if needed
-        ],
+  Widget _buildSearchResults(ThemeData theme) {
+    return _searchResults.isNotEmpty
+        ? Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Search Results',
+                  style: theme.textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                ..._searchResults.map((result) {
+                  return _buildSearchResultCard(result, theme);
+                }).toList(),
+              ],
+            ),
+          )
+        : Container();
+  }
+
+  Widget _buildSearchResultCard(Map<String, dynamic> result, ThemeData theme) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: AssetImage(
+              'assets/images/profile_placeholder.png'), // Placeholder for user image
+        ),
+        title: Text(result['name']),
+        subtitle: Text(result['email']),
+        trailing: IconButton(
+          icon: const Icon(Icons.person_add),
+          onPressed: () {
+            _sendFriendRequest(
+                result['email']); // Send friend request to this user
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, ThemeData theme, IconData icon,
-      {Color? color}) {
-    return ChoiceChip(
-      label: Row(
-        children: [
-          Icon(icon, size: 18, color: color ?? theme.iconTheme.color),
-          const SizedBox(width: 4),
-          Text(label),
-        ],
+  Widget _buildFriendRequestsSection(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            Text(
+              'Friend Requests',
+              style: theme.textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 12,
+              backgroundColor: theme.colorScheme.secondary,
+              child: Text(
+                '${_friendRequests.length}',
+                style: TextStyle(
+                    color: theme.colorScheme.onSecondary, fontSize: 12),
+              ),
+            ),
+          ],
+        ),
+        initiallyExpanded: _isFriendRequestsExpanded,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            _isFriendRequestsExpanded = expanded;
+          });
+        },
+        children: _friendRequests.map((request) {
+          return _buildFriendRequestCard(request, theme);
+        }).toList(),
       ),
-      selected: _selectedFilter == label,
-      onSelected: (selected) {
-        setState(() {
-          _selectedFilter = label;
-        });
-      },
-      backgroundColor: theme.cardColor,
-      selectedColor: theme.colorScheme.secondary.withOpacity(0.3),
-      labelStyle: TextStyle(
-        color: _selectedFilter == label
-            ? theme.colorScheme.onSecondary
-            : theme.textTheme.bodyLarge?.color,
+    );
+  }
+
+  Widget _buildFriendRequestCard(
+      Map<String, dynamic> request, ThemeData theme) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: AssetImage(
+              'assets/images/profile_placeholder.png'), // Placeholder for sender's image
+        ),
+        title: Text(request['senderName']), // Display sender's name
+        subtitle: const Text('Friend request'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.check, color: Colors.green),
+              onPressed: () {
+                _acceptFriendRequest(request['id']); // Accept friend request
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.red),
+              onPressed: () {
+                _declineFriendRequest(request['id']); // Decline friend request
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -194,195 +279,33 @@ class _PalsScreenState extends State<PalsScreen> {
     );
   }
 
-  Widget _buildFriendRequestsSection(ThemeData theme) {
-    final friendRequests = [
-      'Friend Request 1',
-      'Friend Request 2',
-      'Friend Request 3'
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      child: ExpansionTile(
-        title: Row(
-          children: [
-            Text(
-              'Friend Requests',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 12,
-              backgroundColor: theme.colorScheme.secondary,
-              child: Text(
-                '${friendRequests.length}',
-                style: TextStyle(
-                  color: theme.colorScheme.onSecondary,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
-        initiallyExpanded: _isFriendRequestsExpanded,
-        onExpansionChanged: (expanded) {
-          setState(() {
-            _isFriendRequestsExpanded = expanded;
-          });
-        },
-        children: friendRequests.map((request) {
-          return _buildFriendRequestCard(request, theme);
-        }).toList(),
-      ),
-    );
+  Future<void> _acceptFriendRequest(String requestId) async {
+    try {
+      print("Sending request to accept friend request ID: $requestId");
+      await _friendService.acceptFriendRequest(requestId);
+      print("Successfully accepted friend request: $requestId");
+    } catch (e) {
+      print("Error accepting friend request: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error accepting friend request: $e')),
+      );
+    }
   }
 
-  Widget _buildFriendRequestCard(String name, ThemeData theme) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 24,
-            backgroundImage:
-                AssetImage('assets/images/profile_placeholder.png'),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              name,
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              // Handle accept friend request
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.green,
-            ),
-            child: const Text('Accept'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Handle decline friend request
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
-            child: const Text('Decline'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPalCard(
-    ThemeData theme,
-    bool isDarkMode,
-    String name,
-    String status, {
-    required String location,
-    required bool accepted,
-    required bool online,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        _showPalDetails(name, status, location, theme);
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: isDarkMode ? Colors.black26 : Colors.black12,
-              blurRadius: 5,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Stack(
-              children: [
-                const CircleAvatar(
-                  radius: 28,
-                  backgroundImage:
-                      AssetImage('assets/images/profile_placeholder.png'),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: online ? Colors.green : Colors.grey,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: theme.scaffoldBackgroundColor,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    status,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    location,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.secondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.message, color: theme.colorScheme.primary),
-              onPressed: () {
-                // Handle message action
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _declineFriendRequest(String requestId) async {
+    try {
+      await _friendService.declineFriendRequest(requestId);
+      setState(() {
+        _friendRequests.removeWhere((req) => req['id'] == requestId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Friend request declined')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
   }
 
   void _showPalDetails(
@@ -394,7 +317,6 @@ class _PalsScreenState extends State<PalsScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Wrap(
-              // Use Wrap to ensure minimum necessary height
               children: [
                 Center(
                   child: CircleAvatar(
@@ -415,17 +337,13 @@ class _PalsScreenState extends State<PalsScreen> {
                 Center(
                   child: Text(
                     status,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.secondary,
-                    ),
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(color: theme.colorScheme.secondary),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Center(
-                  child: Text(
-                    location,
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  child: Text(location, style: theme.textTheme.bodyMedium),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
@@ -433,17 +351,14 @@ class _PalsScreenState extends State<PalsScreen> {
                     // Handle message action
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                  ),
+                      backgroundColor: theme.colorScheme.primary),
                   child: const Text('Message'),
                 ),
                 TextButton(
                   onPressed: () {
                     // Handle remove pal action
                   },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
                   child: const Text('Remove Pal'),
                 ),
               ],
@@ -453,16 +368,9 @@ class _PalsScreenState extends State<PalsScreen> {
       },
     );
   }
-
-  void _navigateToFindFriendsPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FindFriendsScreen()),
-    );
-  }
 }
 
-// Custom SliverPersistentHeaderDelegate to make the search bar sticky
+// SliverPersistentHeaderDelegate class for sticky header
 class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
 
@@ -475,110 +383,11 @@ class _SearchBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 80; // Adjust height as needed
-
+  double get maxExtent => 80; // Adjust as needed
   @override
-  double get minExtent => 80; // Adjust height as needed
-
+  double get minExtent => 80; // Adjust as needed
   @override
   bool shouldRebuild(_SearchBarDelegate oldDelegate) {
     return oldDelegate.child != child;
-  }
-}
-
-class FindFriendsScreen extends StatelessWidget {
-  const FindFriendsScreen({Key? key}) : super(key: key);
-
-  Future<void> _refreshFriendsList() async {
-    // Simulate network call
-    await Future.delayed(const Duration(seconds: 2));
-    // Update friends list
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Find New Friends',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: theme.colorScheme.primary,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: RefreshIndicator(
-        onRefresh: _refreshFriendsList,
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16.0),
-          itemCount: 10, // Replace with the actual number of new friends
-          itemBuilder: (context, index) {
-            return _buildNewFriendCard(
-              theme,
-              'New Friend $index',
-              'Recently active',
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNewFriendCard(ThemeData theme, String name, String status) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 28,
-            backgroundImage:
-                AssetImage('assets/images/profile_placeholder.png'),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  status,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.secondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Handle send friend request
-            },
-            child: const Text('Add Friend'),
-          ),
-        ],
-      ),
-    );
   }
 }

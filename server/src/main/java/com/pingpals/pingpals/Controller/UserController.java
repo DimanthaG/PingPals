@@ -2,9 +2,9 @@ package com.pingpals.pingpals.Controller;
 
 import com.pingpals.pingpals.Model.User;
 import com.pingpals.pingpals.Repository.UserRepository;
-import com.pingpals.pingpals.Service.FriendRequestService;
 import com.pingpals.pingpals.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,10 +34,25 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/removeFriend/{friendUsername}")
-    public void removeFriend(@PathVariable String friendUsername) {
-        //TODO: Replace User with Authenticated Current User
-        userService.removeFriend("userId", friendUsername);
+    // Secure this endpoint to allow only authenticated requests
+    @GetMapping("/searchUsers")
+    public List<User> searchUsers(@RequestParam String query, @RequestHeader("Authorization") String token) {
+        // Token validation and decoding logic should be in JwtAuthenticationFilter or a utility class
+        System.out.println("Searching for users with query: " + query);
+        return userService.searchUsers(query);
     }
+
+    @GetMapping("/friends")
+    public List<User> getFriendsForUser() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.getFriendsForUser(userId);
+    }
+
+    @DeleteMapping("/removeFriend/{friendId}")
+    public void removeFriend(@PathVariable String friendId) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        userService.removeFriend(userId, friendId);
+    }
+
 
 }

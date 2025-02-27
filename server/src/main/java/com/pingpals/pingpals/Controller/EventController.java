@@ -4,6 +4,7 @@ import com.pingpals.pingpals.Model.Event;
 import com.pingpals.pingpals.Repository.EventRepository;
 import com.pingpals.pingpals.Service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,9 +16,16 @@ public class EventController {
     EventService eventService;
 
     @PostMapping("/addEvent")
-    public void addUser(@RequestBody Event event) {
-        event.setId(null);
-        eventRepository.save(event);
+    public ResponseEntity<Event> addEvent(@RequestBody Event event) {
+        // Set the event creator as part of the Event object itself
+        if (event.getCreator() == null || event.getCreator().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);  // Ensure the creator is provided
+        }
+
+        event.setId(null); // MongoDB will generate the ID
+
+        Event savedEvent = eventRepository.save(event);
+        return ResponseEntity.ok(savedEvent);
     }
 
     @GetMapping("/getEventById/{eventId}")
@@ -34,5 +42,4 @@ public class EventController {
     public Event deleteEventById(@PathVariable String eventId) {
         return eventService.deleteEventById(eventId);
     }
-
 }

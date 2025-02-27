@@ -76,4 +76,10 @@ public class EventUserService {
                 .orElseThrow(() -> new RuntimeException("EventUser not found for eventId: " + eventId + " and userId: " + userId));
         eventUserRepository.delete(eventUser);
     }
+
+    public void inviteFriendToEvent(String eventId, String friendId) {
+        EventUser invitation = new EventUser(null, eventId, friendId, Role.PARTICIPANT, Status.PENDING, LocalDateTime.now());
+        eventUserRepository.save(invitation);
+    }
+
 }

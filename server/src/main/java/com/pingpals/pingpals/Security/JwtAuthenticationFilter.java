@@ -47,6 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
+                System.out.println("JWT validation error: " + e.getMessage()); // Log any JWT parsing errors
                 SecurityContextHolder.clearContext();
             }
         }

@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Document
@@ -26,6 +26,8 @@ public class Event {
     private String description;
 
     private LocationData location;
+
+    private LocalDate date;
 
     private LocalDateTime startTime;
 
