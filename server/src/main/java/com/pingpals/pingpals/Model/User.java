@@ -21,6 +21,7 @@ public class User {
     private String email;
     private String googleId;
     private String pictureUrl;
+    private String fcmToken;
 
     // Ensure friends list is initialized
     private List<String> friends = new ArrayList<>();

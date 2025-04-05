@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "801373348761",
+    "project_id": "pingpals-c0f53",
+    "storage_bucket": "pingpals-c0f53.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801373348761:android:3dd7340d284c3093162908",
+        "android_client_info": {
+          "package_name": "com.example.pingpal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLKegfD2Wewn-U2qRVp7oqQFGnBlFqNtA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801373348761:android:ddaabebbac93ff06162908",
+        "android_client_info": {
+          "package_name": "com.pingpals.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLKegfD2Wewn-U2qRVp7oqQFGnBlFqNtA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

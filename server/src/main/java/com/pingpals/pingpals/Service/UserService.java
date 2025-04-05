@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -28,6 +30,26 @@ public class UserService {
     private String jwtSecret;
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    // Get the ID of the currently authenticated user
+    public String getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User is not authenticated");
+        }
+        return authentication.getName();
+    }
+
+    // Get user by their ID
+    public User getUserById(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+    }
+
+    // Update user details
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
 
     public User processGoogleUser(String googleId, String email, String name, String pictureUrl) {
         try {

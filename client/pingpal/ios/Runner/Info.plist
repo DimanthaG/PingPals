@@ -60,5 +60,43 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+    <string>Not used in app</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Not used in app</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Not used in app</string>
+    <key>NSContactsUsageDescription</key>
+    <string>Not used in app</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Not used in app</string>
+    <key>NSMotionUsageDescription</key>
+    <string>Not used in app</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Not used in app</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Not used in app</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+        <string>processing</string>
+    </array>
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <true/>
+    <key>FIRMessagingAutoRegisterEnablediOS10</key>
+    <true/>
+    <key>FirebaseMessagingAutoInitEnabled</key>
+    <true/>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_dartobservatory._tcp</string>
+    </array>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Allow Flutter tools to connect and debug your application</string>
+    <key>aps-environment</key>
+    <string>development</string>
+    <key>NSNotificationUsageDescription</key>
+    <string>We need to send you notifications for chat messages and event updates</string>
 </dict>
 </plist>

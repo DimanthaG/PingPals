@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EventService {
@@ -22,6 +23,9 @@ public class EventService {
 
     @Autowired
     private EventUserService eventUserService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     // Fetch an event by its ID
     public Event getEventById(String eventId) {
@@ -55,7 +59,21 @@ public class EventService {
         if (updatedEventData.getLocation() != null) existingEvent.setLocation(updatedEventData.getLocation());
 
         // Save the updated event back to the repository
-        return eventRepository.save(existingEvent);
+        Event savedEvent = eventRepository.save(existingEvent);
+
+        // Notify all participants about the update
+        List<EventUser> participants = eventUserRepository.findByEventId(eventId);
+        for (EventUser participant : participants) {
+            if (!participant.getUserId().equals(existingEvent.getCreator())) { // Don't notify the updater
+                notificationService.sendEventUpdateNotification(
+                    participant.getUserId(),
+                    eventId,
+                    existingEvent.getTitle()
+                );
+            }
+        }
+
+        return savedEvent;
     }
 
     // Delete an event by its ID

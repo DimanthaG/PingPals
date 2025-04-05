@@ -1,0 +1,2 @@
+/Users/dimanthagoonewardena/Desktop/PingPals3/client/pingpal/android/app/.cxx/Debug/3a06d1z4/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/dimanthagoonewardena/Desktop/PingPals3/client/pingpal/android/app/.cxx/Debug/3a06d1z4/arm64-v8a/CMakeFiles/edit_cache.dir

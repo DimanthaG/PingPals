@@ -16,20 +16,20 @@ dependencies:
     sdk: flutter
   google_sign_in: ^6.2.1
   flutter_secure_storage: ^5.0.2
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^16.3.0
+  http: ^1.1.2
+  get: ^4.6.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
-
-  # Enable generation of localized Strings from arb files.
   generate: true
-
   assets:
-    # Add assets from the images directory to the application.
     - assets/images/
     - assets/google_logo.png

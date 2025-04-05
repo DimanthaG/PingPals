@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class LoginPage extends StatefulWidget {
   final ThemeNotifier themeNotifier;
@@ -17,6 +18,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   late bool isDarkMode;
+  bool _isSigningIn = false;  // Add this flag to prevent multiple sign-in attempts
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
   );
@@ -105,26 +107,42 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleGoogleSignIn() async {
+    if (_isSigningIn) return;  // Prevent multiple simultaneous sign-in attempts
+    
     try {
+      setState(() {
+        _isSigningIn = true;
+      });
+
       GoogleSignInAccount? account = await _googleSignIn.signIn();
       if (account != null) {
         GoogleSignInAuthentication auth = await account.authentication;
         String? idToken = auth.idToken;
 
         // Send the ID token to your server for verification
-        await _authenticateWithServer(idToken!);
-
-        widget.onLoginSuccess(context);
+        bool success = await _authenticateWithServer(idToken!);
+        
+        if (success && mounted) {
+          widget.onLoginSuccess(context);
+        }
       }
     } catch (error) {
       print('Google Sign-In error: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google Sign-In failed. Please try again.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google Sign-In failed. Please try again.')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSigningIn = false;
+        });
+      }
     }
   }
 
-  Future<void> _authenticateWithServer(String idToken) async {
+  Future<bool> _authenticateWithServer(String idToken) async {
     try {
       final response = await http.post(
         Uri.parse('http://localhost:8080/auth/google'),
@@ -142,17 +160,44 @@ class _LoginPageState extends State<LoginPage> {
         await secureStorage.write(key: 'refreshToken', value: refreshToken);
 
         print('Tokens saved successfully');
+        
+        // Get and update FCM token right after storing the auth tokens
+        try {
+          final fcmToken = await FirebaseMessaging.instance.getToken();
+          if (fcmToken != null) {
+            final fcmResponse = await http.post(
+              Uri.parse('http://localhost:8080/api/notifications/token'),
+              headers: {
+                'Authorization': 'Bearer $accessToken',
+                'Content-Type': 'application/json',
+              },
+              body: jsonEncode({'token': fcmToken}),
+            );
+            
+            print('FCM token update response: ${fcmResponse.statusCode}');
+          }
+        } catch (e) {
+          print('Error updating FCM token: $e');
+        }
+        
+        return true;
       } else {
         print('Server responded with status code ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Authentication failed. Please try again.')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Authentication failed. Please try again.')),
+          );
+        }
+        return false;
       }
     } catch (e) {
       print('Error authenticating with server: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred. Please try again.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred. Please try again.')),
+        );
+      }
+      return false;
     }
   }
 }
