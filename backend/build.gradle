@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.5'
+    id 'io.spring.dependency-management' version '1.1.3'
+}
+
+group = 'com.pingpals'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+// Explicitly define mainClass and executable JAR properties
+springBoot {
+    mainClass = 'com.pingpals.pingpals.PingpalsApplication'
+}
+
+bootJar {
+    archiveFileName = 'app.jar'
+    manifest {
+        attributes 'Start-Class': 'com.pingpals.pingpals.PingpalsApplication'
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    google()  // Add Google's Maven repository
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // Google API Client Libraries
+    implementation('com.google.api-client:google-api-client:1.35.2') {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation 'com.google.http-client:google-http-client-jackson2:1.41.5'
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.19.0'
+
+    // Include secure version of Guava
+    implementation 'com.google.guava:guava:32.1.2-jre'
+
+    // JWT Libraries
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Firebase Admin SDK with explicit dependencies
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
+    implementation 'com.google.cloud:google-cloud-storage:2.22.4'
+    implementation 'com.google.cloud:google-cloud-firestore:3.13.4'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    // Add dotenv support
+    implementation 'io.github.cdimascio:dotenv-java:2.3.2'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

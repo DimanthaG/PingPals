@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: pingpals-api
+    env: docker
+    region: singapore  # Choose the region closest to your users
+    healthCheckPath: /actuator/health
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: MONGODB_URI
+        sync: false  # This means you'll set this manually in the Render dashboard
+      - key: JWT_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: FIREBASE_CREDENTIALS_JSON
+        sync: false
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
