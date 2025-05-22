@@ -12,7 +12,20 @@
           "package_name": "com.example.pingpal"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "801373348761-ag4h928lis3ejvprruutpnah6hg8aqjh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pingpal",
+            "certificate_hash": "a7bcc3ba49e5fab2758b38128158ebfe8205c8d0"
+          }
+        },
+        {
+          "client_id": "801373348761-9br5ei64qv6reu56ia5s96guu3im9mim.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBLKegfD2Wewn-U2qRVp7oqQFGnBlFqNtA"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801373348761-9br5ei64qv6reu56ia5s96guu3im9mim.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "801373348761-n3qrbkduimqkenj4agbpgop4f6k1m8nt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pingpals.app"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +56,20 @@
           "package_name": "com.pingpals.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "801373348761-u47uceq66t0osghs8sjfegd21nk8sde2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pingpals.app",
+            "certificate_hash": "a7bcc3ba49e5fab2758b38128158ebfe8205c8d0"
+          }
+        },
+        {
+          "client_id": "801373348761-9br5ei64qv6reu56ia5s96guu3im9mim.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBLKegfD2Wewn-U2qRVp7oqQFGnBlFqNtA"
@@ -39,7 +77,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801373348761-9br5ei64qv6reu56ia5s96guu3im9mim.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "801373348761-n3qrbkduimqkenj4agbpgop4f6k1m8nt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pingpals.app"
+              }
+            }
+          ]
         }
       }
     }

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class FriendService {
-  final String baseUrl = 'http://localhost:8080';
+  final String baseUrl = 'https://pingpals-backend.onrender.com';
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   // Fetch the JWT token from secure storage
@@ -49,6 +49,8 @@ class FriendService {
         Uri.parse('$baseUrl/searchUsers?query=$query'),
         headers: {'Authorization': 'Bearer $token'},
       );
+      print('Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
@@ -67,14 +69,19 @@ class FriendService {
         throw Exception('JWT token not found');
       }
 
+      print('Sending friend request to: $friendEmail');
       final response = await http.post(
         Uri.parse('$baseUrl/friendRequests/create/$friendEmail'),
         headers: {'Authorization': 'Bearer $token'},
       );
+      print('Friend request response status: ${response.statusCode}');
+      print('Friend request response body: ${response.body}');
+      
       if (response.statusCode != 200) {
-        throw Exception('Failed to send friend request');
+        throw Exception('Failed to send friend request: ${response.body}');
       }
     } catch (e) {
+      print('Error sending friend request: $e');
       throw Exception('Error sending friend request: $e');
     }
   }

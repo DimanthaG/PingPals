@@ -3,20 +3,68 @@ import 'package:get/get.dart';
 import 'package:pingpal/src/widgets/nav_bar.dart';
 import 'package:pingpal/theme/theme_notifier.dart';
 import 'package:pingpal/src/screens/login.dart';
+import 'package:pingpal/src/screens/notifications_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:pingpal/src/services/notification_service.dart';
+import 'package:pingpal/src/utils/auth_diagnostics.dart';
+import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   print("Handling a background message: ${message.messageId}");
+  
+  // Handle the received message
+  RemoteNotification? notification = message.notification;
+  if (notification != null) {
+    print('Background notification received: ${notification.title}');
+    
+    try {
+      // Save notification to local storage for retrieval when app opens
+      final notificationData = {
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'title': notification.title ?? 'New Notification',
+        'body': notification.body ?? '',
+        'data': message.data,
+        'timestamp': DateTime.now().toIso8601String(),
+        'isRead': false,
+      };
+      
+      // Get shared preferences
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Get existing notifications or empty list
+      final List<String> savedNotifications = 
+          prefs.getStringList('background_notifications') ?? [];
+      
+      // Add new notification
+      savedNotifications.add(json.encode(notificationData));
+      
+      // Limit to 50 notifications by removing oldest if needed
+      if (savedNotifications.length > 50) {
+        savedNotifications.removeAt(0);
+      }
+      
+      // Save back to shared preferences
+      await prefs.setStringList('background_notifications', savedNotifications);
+      
+      print('Saved background notification: ${notification.title}');
+    } catch (e) {
+      print('Error saving background notification: $e');
+    }
+  }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  print('===== PingPals App Starting =====');
+  print('Debug mode: ${kDebugMode}');
   
   // Initialize Firebase with retry
   bool firebaseInitialized = false;
@@ -39,6 +87,13 @@ Future<void> main() async {
     print('Failed to initialize Firebase after 3 attempts');
   }
   
+  // Run auth diagnostics
+  try {
+    await AuthDiagnostics.runDiagnostics();
+  } catch (e) {
+    print('Error running diagnostics: $e');
+  }
+  
   // Set up background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   
@@ -58,7 +113,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp( // Use GetMaterialApp for navigation
       title: 'PingPals',
       theme: themeNotifier.currentTheme,
       home: FutureBuilder<String?>(
@@ -76,13 +131,16 @@ class MyApp extends StatelessWidget {
                 );
         },
       ),
-      routes: {
-        '/login': (context) => LoginPage(
+      getPages: [
+        GetPage(name: '/login', page: () => LoginPage(
           themeNotifier: themeNotifier,
           onLoginSuccess: _navigateToMainApp,
-        ),
-        '/nav': (context) => NavBar(themeNotifier: themeNotifier),
-      },
+        )),
+        GetPage(name: '/nav', page: () => NavBar(themeNotifier: themeNotifier)),
+        GetPage(name: '/notifications', page: () => NavBar(themeNotifier: themeNotifier, initialTabIndex: 3)),
+        GetPage(name: '/friend-requests', page: () => NavBar(themeNotifier: themeNotifier, initialTabIndex: 1)),
+        GetPage(name: '/friends', page: () => NavBar(themeNotifier: themeNotifier, initialTabIndex: 1)),
+      ],
     );
   }
 

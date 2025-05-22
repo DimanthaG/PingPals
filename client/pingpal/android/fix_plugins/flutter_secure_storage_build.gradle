@@ -1,0 +1,26 @@
+plugins {
+    id 'com.android.library'
+}
+
+def safeExtGet(name) {
+    rootProject.ext.has(name) ? rootProject.ext.get(name) : null
+}
+
+android {
+    namespace "com.it_nomads.fluttersecurestorage"
+    compileSdkVersion 33
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    defaultConfig {
+        minSdkVersion 18
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.7.1'
+} 

@@ -61,7 +61,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     final payload =
         utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
     final Map<String, dynamic> payloadMap = json.decode(payload);
-    return payloadMap['sub']; // Google’s userId (sub) claim
+    return payloadMap['sub']; // Google's userId (sub) claim
   }
 
   void _selectDate() async {
@@ -185,8 +185,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         print('Event Data: ${jsonEncode(event)}');
 
         final response = await http.post(
-          Uri.parse(
-              'http://localhost:8080/addEvent'), // Ensure backend URL is correct
+          Uri.parse('https://pingpals-backend.onrender.com/addEvent'), // Ensure backend URL is correct
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $jwtToken',

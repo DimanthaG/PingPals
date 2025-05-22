@@ -1,24 +1,101 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Enum for notification types
+enum NotificationType {
+  FRIEND_REQUEST,
+  FRIEND_ACCEPT,
+  FRIEND_DECLINE,
+  FRIEND_REMOVE,
+  EVENT_INVITE,
+  EVENT_UPDATE,
+  EVENT_REMINDER,
+  EVENT_JOINED,
+  EVENT_LEFT,
+  EVENT_CANCELLED,
+  CHAT_MESSAGE,
+  CHAT_MENTION,
+  SYSTEM
+}
+
+// Get string representation of notification type
+extension NotificationTypeExtension on NotificationType {
+  String get value {
+    return toString().split('.').last;
+  }
+  
+  // Get string representation from string
+  static NotificationType? fromString(String? type) {
+    if (type == null) return null;
+    
+    try {
+      return NotificationType.values.firstWhere(
+        (e) => e.value == type,
+        orElse: () => NotificationType.SYSTEM,
+      );
+    } catch (e) {
+      return NotificationType.SYSTEM;
+    }
+  }
+}
+
+class NotificationModel {
+  final String id;
+  final String title;
+  final String body;
+  final Map<String, dynamic> data;
+  final DateTime timestamp;
+  bool isRead;
+
+  NotificationModel({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.data,
+    required this.timestamp,
+    this.isRead = false,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'body': body,
+    'data': data,
+    'timestamp': timestamp.toIso8601String(),
+    'isRead': isRead,
+  };
+
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
+      id: json['id'],
+      title: json['title'],
+      body: json['body'],
+      data: json['data'] ?? {},
+      timestamp: DateTime.parse(json['timestamp']),
+      isRead: json['isRead'] ?? false,
+    );
+  }
+  
+  NotificationType? get type {
+    return NotificationTypeExtension.fromString(data['type']);
+  }
+}
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   
+  // List to store local notifications
+  final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
+  
   static String get baseUrl {
-    if (Platform.isAndroid) {
-      return 'http://10.0.2.2:8080/api';
-    } else if (Platform.isIOS) {
-      return 'http://127.0.0.1:8080/api';
-    } else {
-      return 'http://localhost:8080/api';
-    }
+    // Use HTTPS for production endpoints on all devices
+    return 'https://pingpals-backend.onrender.com/api';
   }
 
   static final NotificationService _instance = NotificationService._internal();
@@ -42,23 +119,11 @@ class NotificationService {
         }
       }
 
-      // Initialize local notifications first
-      const initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-      const initializationSettingsIOS = DarwinInitializationSettings(
-        requestSoundPermission: true,
-        requestBadgePermission: true,
-        requestAlertPermission: true,
-      );
+      // Load saved notifications
+      await _loadSavedNotifications();
       
-      const initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsIOS,
-      );
-
-      await _flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
-        onDidReceiveNotificationResponse: _onSelectNotification,
-      );
+      // Load and merge any background notifications
+      await _loadBackgroundNotifications();
 
       // Request notification permissions with retry
       NotificationSettings? settings;
@@ -90,7 +155,7 @@ class NotificationService {
       FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
       FirebaseMessaging.onMessageOpenedApp.listen((message) {
         print('Message opened app: ${message.data}');
-        _handleNotificationTap(message.data);
+        handleNotificationTap(message.data);
       });
 
       // Skip FCM token retrieval on simulator
@@ -130,84 +195,183 @@ class NotificationService {
     }
   }
 
+  Future<void> _loadSavedNotifications() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedNotifications = prefs.getStringList('notifications') ?? [];
+      
+      notifications.clear();
+      for (var notificationJson in savedNotifications) {
+        try {
+          final notificationData = json.decode(notificationJson);
+          final notification = NotificationModel.fromJson(notificationData);
+          notifications.add(notification);
+        } catch (e) {
+          print('Error parsing saved notification: $e');
+        }
+      }
+      
+      // Sort by timestamp (newest first)
+      notifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      
+      print('Loaded ${notifications.length} saved notifications');
+    } catch (e) {
+      print('Error loading saved notifications: $e');
+    }
+  }
+  
+  Future<void> _loadBackgroundNotifications() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final backgroundNotifications = prefs.getStringList('background_notifications') ?? [];
+      
+      if (backgroundNotifications.isNotEmpty) {
+        print('Found ${backgroundNotifications.length} background notifications');
+        
+        for (var notificationJson in backgroundNotifications) {
+          try {
+            final notificationData = json.decode(notificationJson);
+            final notification = NotificationModel.fromJson(notificationData);
+            
+            // Add to the main notifications list
+            notifications.insert(0, notification);
+          } catch (e) {
+            print('Error parsing background notification: $e');
+          }
+        }
+        
+        // Clear the background notifications after loading
+        await prefs.setStringList('background_notifications', []);
+        
+        // Sort and save the combined notifications
+        notifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        
+        // Limit to 50 notifications
+        if (notifications.length > 50) {
+          notifications.removeRange(50, notifications.length);
+        }
+        
+        // Save the merged notifications
+        await saveNotifications();
+        
+        print('Merged background notifications into main notifications list');
+      }
+    } catch (e) {
+      print('Error loading background notifications: $e');
+    }
+  }
+  
+  Future<void> saveNotifications() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final notificationsJson = notifications
+          .map((notification) => json.encode(notification.toJson()))
+          .toList();
+      
+      await prefs.setStringList('notifications', notificationsJson);
+      print('Saved ${notifications.length} notifications');
+    } catch (e) {
+      print('Error saving notifications: $e');
+    }
+  }
+  
+  void addNotification(String title, String body, Map<String, dynamic> data) {
+    final notification = NotificationModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+      body: body,
+      data: data,
+      timestamp: DateTime.now(),
+    );
+    
+    // Add to list
+    notifications.insert(0, notification);
+    
+    // Limit to 50 notifications
+    if (notifications.length > 50) {
+      notifications.removeLast();
+    }
+    
+    // Save updated list
+    saveNotifications();
+  }
+  
+  void markNotificationAsRead(String id) {
+    final index = notifications.indexWhere((notification) => notification.id == id);
+    if (index != -1) {
+      notifications[index].isRead = true;
+      saveNotifications();
+    }
+  }
+  
+  void markAllNotificationsAsRead() {
+    for (var notification in notifications) {
+      notification.isRead = true;
+    }
+    saveNotifications();
+  }
+  
+  void clearNotifications() {
+    notifications.clear();
+    saveNotifications();
+  }
+
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     RemoteNotification? notification = message.notification;
     if (notification != null) {
-      print('Showing local notification for foreground message');
-      await showNotification(
+      print('Received foreground message: ${notification.title}');
+      
+      // Save notification to local storage
+      addNotification(
         notification.title ?? 'New Notification',
         notification.body ?? '',
         message.data,
       );
+      
+      // Using Firebase's built-in notification display
     }
   }
 
-  Future<void> _onSelectNotification(NotificationResponse response) async {
-    final payload = response.payload;
-    if (payload != null) {
-      final data = json.decode(payload);
-      _handleNotificationTap(data);
-    }
-  }
-
-  void _handleNotificationTap(Map<String, dynamic> data) {
-    switch (data['type']) {
-      case 'FRIEND_REQUEST':
+  void handleNotificationTap(Map<String, dynamic> data) {
+    final type = NotificationTypeExtension.fromString(data['type']);
+    
+    switch (type) {
+      case NotificationType.FRIEND_REQUEST:
         Get.toNamed('/friend-requests');
         break;
-      case 'FRIEND_REQUEST_ACCEPTED':
-      case 'FRIEND_REQUEST_DECLINED':
-      case 'FRIEND_REMOVED':
+      
+      case NotificationType.FRIEND_ACCEPT:
+      case NotificationType.FRIEND_DECLINE:
+      case NotificationType.FRIEND_REMOVE:
         Get.toNamed('/friends');
         break;
-      case 'EVENT_INVITE':
-      case 'EVENT_UPDATE':
-      case 'EVENT_JOINED':
-      case 'EVENT_LEFT':
-      case 'EVENT_CANCELLED':
-      case 'EVENT_REMINDER':
-        if (data['eventId'] != null) {
-          Get.toNamed('/event/${data['eventId']}');
+      
+      case NotificationType.EVENT_INVITE:
+      case NotificationType.EVENT_UPDATE:
+      case NotificationType.EVENT_REMINDER:
+      case NotificationType.EVENT_JOINED:
+      case NotificationType.EVENT_LEFT:
+      case NotificationType.EVENT_CANCELLED:
+        if (data['entityId'] != null) {
+          Get.toNamed('/event/${data['entityId']}');
         } else {
           Get.toNamed('/events');
         }
         break;
-      case 'CHAT_MESSAGE':
-      case 'CHAT_MENTION':
-        if (data['eventId'] != null) {
-          Get.toNamed('/event/${data['eventId']}/chat');
+      
+      case NotificationType.CHAT_MESSAGE:
+      case NotificationType.CHAT_MENTION:
+        if (data['entityId'] != null) {
+          Get.toNamed('/event/${data['entityId']}/chat');
         }
         break;
+      
+      case NotificationType.SYSTEM:
+      default:
+        // For unknown types, go to notification center
+        Get.toNamed('/notifications');
+        break;
     }
-  }
-
-  Future<void> showNotification(String title, String body, Map<String, dynamic> payload) async {
-    const androidDetails = AndroidNotificationDetails(
-      'default_notification_channel',
-      'Default Notifications',
-      channelDescription: 'Default notification channel',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    
-    const iosDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
-    
-    const notificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
-
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      notificationDetails,
-      payload: json.encode(payload),
-    );
   }
 
   Future<void> updateFcmToken(String token) async {

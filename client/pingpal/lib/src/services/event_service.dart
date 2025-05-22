@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class EventService {
-  final String baseUrl = 'http://localhost:8080';
+  final String baseUrl = 'https://pingpals-backend.onrender.com';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   Future<String?> getToken() async {

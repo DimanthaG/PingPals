@@ -1,37 +1,47 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Show notification even when app is terminated
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = 
-      FlutterLocalNotificationsPlugin();
-
-  const androidDetails = AndroidNotificationDetails(
-    'default_notification_channel',
-    'Default Notifications',
-    channelDescription: 'Default notification channel',
-    importance: Importance.max,
-    priority: Priority.high,
-  );
-    
-  const iosDetails = DarwinNotificationDetails(
-    presentAlert: true,
-    presentBadge: true,
-    presentSound: true,
-  );
-    
-  const notificationDetails = NotificationDetails(
-    android: androidDetails,
-    iOS: iosDetails,
-  );
-
+  // Log the message but use Firebase's built-in notification display
   RemoteNotification? notification = message.notification;
   if (notification != null) {
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      notification.title ?? 'New Notification',
-      notification.body ?? '',
-      notificationDetails,
-    );
+    print('Background message received: ${notification.title}');
+    
+    try {
+      // Save notification to local storage for retrieval when app opens
+      final notificationData = {
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'title': notification.title ?? 'New Notification',
+        'body': notification.body ?? '',
+        'data': message.data,
+        'timestamp': DateTime.now().toIso8601String(),
+        'isRead': false,
+      };
+      
+      // Get shared preferences
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Get existing notifications or empty list
+      final List<String> savedNotifications = 
+          prefs.getStringList('background_notifications') ?? [];
+      
+      // Add new notification
+      savedNotifications.add(json.encode(notificationData));
+      
+      // Limit to 50 notifications by removing oldest if needed
+      if (savedNotifications.length > 50) {
+        savedNotifications.removeAt(0);
+      }
+      
+      // Save back to shared preferences
+      await prefs.setStringList('background_notifications', savedNotifications);
+      
+      print('Saved background notification: ${notification.title}');
+    } catch (e) {
+      print('Error saving background notification: $e');
+    }
+    
+    // Firebase will automatically display the notification
   }
 }

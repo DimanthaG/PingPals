@@ -14,13 +14,15 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  google_sign_in: ^6.2.1
-  flutter_secure_storage: ^5.0.2
+  google_sign_in: ^6.1.0
+  flutter_secure_storage: ^8.0.0
   firebase_core: ^2.24.2
   firebase_messaging: ^14.7.10
-  flutter_local_notifications: ^16.3.0
+  firebase_auth: ^4.15.3
   http: ^1.1.2
   get: ^4.6.6
+  shared_preferences: ^2.2.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
