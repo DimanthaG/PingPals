@@ -17,6 +17,7 @@ class _PalsScreenState extends State<PalsScreen> {
 
   List<dynamic> _searchResults = []; // Holds the search results
   List<dynamic> _friendRequests = []; // Holds friend requests
+  List<dynamic> _friends = []; // Holds the list of accepted friends
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController =
       TextEditingController(); // Controller for search input
@@ -25,6 +26,20 @@ class _PalsScreenState extends State<PalsScreen> {
   void initState() {
     super.initState();
     _fetchFriendRequests(); // Fetch friend requests on initialization
+    _fetchFriends(); // Fetch accepted friends on initialization
+  }
+
+  Future<void> _fetchFriends() async {
+    try {
+      final friends = await _friendService.fetchFriends();
+      setState(() {
+        _friends = friends;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
   }
 
   Future<void> _fetchFriendRequests() async {
@@ -87,7 +102,10 @@ class _PalsScreenState extends State<PalsScreen> {
         actions: [_buildSortMenu(theme)],
       ),
       body: RefreshIndicator(
-        onRefresh: _fetchFriendRequests,
+        onRefresh: () async {
+          await _fetchFriendRequests();
+          await _fetchFriends();
+        },
         child: CustomScrollView(
           controller: _scrollController,
           slivers: [
@@ -101,6 +119,10 @@ class _PalsScreenState extends State<PalsScreen> {
             // Friend Requests Section
             SliverToBoxAdapter(
               child: _buildFriendRequestsSection(theme),
+            ),
+            // Friends List Section
+            SliverToBoxAdapter(
+              child: _buildFriendsListSection(theme),
             ),
             // Search Results Section
             SliverToBoxAdapter(
@@ -139,6 +161,64 @@ class _PalsScreenState extends State<PalsScreen> {
             _searchUsers(query); // Trigger search when user submits query
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildFriendsListSection(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'My Pals',
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          _friends.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'No friends yet. Search for friends above!',
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                  ),
+                )
+              : Column(
+                  children: _friends.map((friend) {
+                    return _buildFriendCard(friend, theme);
+                  }).toList(),
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFriendCard(Map<String, dynamic> friend, ThemeData theme) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: const AssetImage('assets/images/profile_placeholder.png'),
+        ),
+        title: Text(friend['name'] ?? 'Unknown'),
+        subtitle: Text(friend['email'] ?? ''),
+        trailing: IconButton(
+          icon: const Icon(Icons.message),
+          onPressed: () {
+            // Handle messaging friend
+          },
+        ),
+        onTap: () {
+          _showPalDetails(
+            friend['name'] ?? 'Unknown',
+            friend['status'] ?? 'No status',
+            friend['location'] ?? 'No location',
+            theme,
+          );
+        },
       ),
     );
   }
@@ -284,6 +364,14 @@ class _PalsScreenState extends State<PalsScreen> {
       print("Sending request to accept friend request ID: $requestId");
       await _friendService.acceptFriendRequest(requestId);
       print("Successfully accepted friend request: $requestId");
+      
+      // Update the UI by fetching fresh data
+      await _fetchFriendRequests();
+      await _fetchFriends();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Friend request accepted')),
+      );
     } catch (e) {
       print("Error accepting friend request: $e");
       ScaffoldMessenger.of(context).showSnackBar(
