@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pingpal/src/widgets/nav_bar.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,11 +19,13 @@ class MyApp extends StatelessWidget {
 }
 
 class EventsPage extends StatefulWidget {
+  const EventsPage({super.key});
+
   @override
   _EventsPageState createState() => _EventsPageState();
 }
 
-class _EventsPageState extends State<EventsPage> {
+class _EventsPageState extends State<EventsPage> with NavBarPadding {
   // List of events with dark mode colors
   final List<Map<String, dynamic>> _events = [
     {
@@ -151,7 +154,7 @@ class _EventsPageState extends State<EventsPage> {
           // Event cards list
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.only(top: 8, bottom: 8),
+              padding: NavBarPadding.getScreenPadding(context),
               children: _filteredEvents.map((event) {
                 return _buildEventCard(
                   event['title'],

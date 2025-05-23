@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pingpal/src/widgets/nav_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatelessWidget with NavBarPadding {
   const HomeScreen({super.key});
 
   @override
@@ -24,6 +25,7 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
+        padding: NavBarPadding.getScreenPadding(context),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

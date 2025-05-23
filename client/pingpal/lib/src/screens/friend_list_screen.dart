@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pingpal/src/services/friend_service.dart';
+import 'package:pingpal/src/widgets/nav_bar.dart';
 
 class PalsScreen extends StatefulWidget {
   const PalsScreen({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class PalsScreen extends StatefulWidget {
   _PalsScreenState createState() => _PalsScreenState();
 }
 
-class _PalsScreenState extends State<PalsScreen> {
+class _PalsScreenState extends State<PalsScreen> with NavBarPadding {
   final FriendService _friendService =
       FriendService(); // Create an instance of FriendService
   String _selectedFilter = 'All';

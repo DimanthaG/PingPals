@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
+import 'package:pingpal/src/widgets/nav_bar.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -11,7 +12,7 @@ class CreateEventScreen extends StatefulWidget {
   _CreateEventScreenState createState() => _CreateEventScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> {
+class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPadding {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -240,135 +241,133 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildFullWidthCard(
-                  theme,
-                  cardColor,
-                  child: TextFormField(
-                    controller: _titleController,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: textColor,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Event Title',
-                      hintStyle: TextStyle(color: hintColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                      filled: true,
-                      fillColor: fillColor,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an event title';
-                      }
-                      return null;
-                    },
+      body: SingleChildScrollView(
+        padding: NavBarPadding.getScreenPadding(context),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildFullWidthCard(
+                theme,
+                cardColor,
+                child: TextFormField(
+                  controller: _titleController,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: textColor,
                   ),
-                ),
-                const SizedBox(height: 20),
-                _buildFullWidthCard(
-                  theme,
-                  cardColor,
-                  child: TextFormField(
-                    controller: _descriptionController,
-                    maxLines: 2,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: textColor,
+                  decoration: InputDecoration(
+                    hintText: 'Event Title',
+                    hintStyle: TextStyle(color: hintColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
                     ),
-                    decoration: InputDecoration(
-                      labelText: 'Event Description',
-                      labelStyle: TextStyle(color: hintColor),
-                      hintStyle: TextStyle(color: hintColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: fillColor,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an event description';
-                      }
-                      return null;
-                    },
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    filled: true,
+                    fillColor: fillColor,
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an event title';
+                    }
+                    return null;
+                  },
                 ),
-                const SizedBox(height: 20),
-                // Date Picker Input
-                _buildFullWidthCard(
-                  theme,
-                  cardColor,
-                  child: TextFormField(
-                    controller: _dateController,
-                    decoration: InputDecoration(
-                      labelText: 'Event Date',
-                      hintText: 'YYYY-MM-DD',
-                      hintStyle: TextStyle(color: hintColor),
-                      suffixIcon: Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: fillColor,
-                    ),
-                    readOnly: true,
-                    onTap: _selectDate,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please select a date';
-                      }
-                      return null;
-                    },
-                    style:
-                        theme.textTheme.bodyMedium?.copyWith(color: textColor),
+              ),
+              const SizedBox(height: 20),
+              _buildFullWidthCard(
+                theme,
+                cardColor,
+                child: TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 2,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: textColor,
                   ),
-                ),
-                const SizedBox(height: 20),
-                _buildLocationSection(theme, textColor, hintColor, fillColor),
-                const SizedBox(height: 20),
-                _buildTimeAndCapacitySection(theme, textColor, hintColor),
-                const SizedBox(height: 20),
-                _buildInvitePalsSection(theme, cardColor, dividerColor),
-                const SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _createEvent,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: Colors.yellow[700],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 24,
-                      ),
+                  decoration: InputDecoration(
+                    labelText: 'Event Description',
+                    labelStyle: TextStyle(color: hintColor),
+                    hintStyle: TextStyle(color: hintColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
-                    child: const Text(
-                      'Ping!',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
+                    filled: true,
+                    fillColor: fillColor,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an event description';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Date Picker Input
+              _buildFullWidthCard(
+                theme,
+                cardColor,
+                child: TextFormField(
+                  controller: _dateController,
+                  decoration: InputDecoration(
+                    labelText: 'Event Date',
+                    hintText: 'YYYY-MM-DD',
+                    hintStyle: TextStyle(color: hintColor),
+                    suffixIcon: Icon(Icons.calendar_today),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: fillColor,
+                  ),
+                  readOnly: true,
+                  onTap: _selectDate,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a date';
+                    }
+                    return null;
+                  },
+                  style:
+                      theme.textTheme.bodyMedium?.copyWith(color: textColor),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildLocationSection(theme, textColor, hintColor, fillColor),
+              const SizedBox(height: 20),
+              _buildTimeAndCapacitySection(theme, textColor, hintColor),
+              const SizedBox(height: 20),
+              _buildInvitePalsSection(theme, cardColor, dividerColor),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _createEvent,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.yellow[700],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 24,
                     ),
                   ),
+                  child: const Text(
+                    'Ping!',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

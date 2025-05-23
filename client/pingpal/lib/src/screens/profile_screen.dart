@@ -2,11 +2,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pingpal/theme/theme_notifier.dart';
+import 'package:pingpal/src/widgets/nav_bar.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatelessWidget with NavBarPadding {
   final ThemeNotifier themeNotifier;
 
-  ProfilePage({required this.themeNotifier});
+  const ProfilePage({super.key, required this.themeNotifier});
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +20,17 @@ class ProfilePage extends StatelessWidget {
           _buildProfileHeader(isDarkMode),
           Expanded(
             child: ListView(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+              padding: EdgeInsets.only(
+                top: 16.0,
+                left: 16.0,
+                right: 16.0,
+                bottom: NavBarPadding.getNavBarHeight(context) + MediaQuery.of(context).padding.bottom + 16.0,
+              ),
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildStatCard(
-                        'Events Attended', '27', Colors.orangeAccent),
+                    _buildStatCard('Events Attended', '27', Colors.orangeAccent),
                     _buildStatCard('Events Created', '14', Colors.greenAccent),
                   ],
                 ),
@@ -36,6 +40,7 @@ class ProfilePage extends StatelessWidget {
                 _buildSwitchTile('Change Theme', themeNotifier, isDarkMode),
                 _buildOptionTile('Blocked List', Icons.block, isDarkMode),
                 _buildLogoutTile(isDarkMode, context),
+                const SizedBox(height: 16.0),
               ],
             ),
           ),
