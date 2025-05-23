@@ -89,81 +89,82 @@ class _NavBarState extends State<NavBar> {
                 !notification.isRead)
             .length;
             
-        return SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: (isDarkMode 
-                      ? Color(0xFF242424).withOpacity(0.5) 
-                      : Color(0xFFF3F0F7).withOpacity(0.5)
+        return Container(
+          padding: EdgeInsets.only(
+            left: 8, 
+            right: 8,
+            bottom: Platform.isIOS ? 0 : 8, // No bottom padding on iOS
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: (isDarkMode 
+                    ? Color(0xFF242424).withOpacity(0.5) 
+                    : Color(0xFFF3F0F7).withOpacity(0.5)
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode 
+                        ? Colors.black.withOpacity(0.2) 
+                        : Colors.grey.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
                     ),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDarkMode 
-                          ? Colors.black.withOpacity(0.2) 
-                          : Colors.grey.withOpacity(0.2),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
+                  ],
+                  border: Border.all(
+                    color: isDarkMode 
+                      ? Colors.white.withOpacity(0.1) 
+                      : Colors.black.withOpacity(0.05),
+                    width: 0.5,
+                  ),
+                ),
+                child: NavigationBarTheme(
+                  data: NavigationBarThemeData(
+                    indicatorShape: StadiumBorder(),
+                    height: 45, // Same height for both platforms
+                    labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+                  ),
+                  child: NavigationBar(
+                    height: 45, // Same height for both platforms
+                    elevation: 0,
+                    selectedIndex: _selectedIndex,
+                    backgroundColor: Colors.transparent,
+                    indicatorColor: (isDarkMode 
+                      ? Color.fromARGB(255, 246, 167, 63).withOpacity(0.7) 
+                      : Color.fromARGB(255, 246, 167, 63).withOpacity(0.7)
+                    ),
+                    labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+                    onDestinationSelected: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                    destinations: [
+                      NavigationDestination(
+                        icon: Icon(Icons.home, size: _iconSize),
+                        label: '',
+                      ),
+                      NavigationDestination(
+                        icon: _buildNotificationIcon(friendRequestCount, Icons.people),
+                        label: '',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.add_circle_outline, size: _iconSize),
+                        label: '',
+                      ),
+                      NavigationDestination(
+                        icon: _buildNotificationIcon(eventNotificationCount, Icons.notifications),
+                        label: '',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.person, size: _iconSize),
+                        label: '',
                       ),
                     ],
-                    border: Border.all(
-                      color: isDarkMode 
-                        ? Colors.white.withOpacity(0.1) 
-                        : Colors.black.withOpacity(0.05),
-                      width: 0.5,
-                    ),
-                  ),
-                  child: NavigationBarTheme(
-                    data: NavigationBarThemeData(
-                      indicatorShape: StadiumBorder(),
-                      height: Platform.isIOS ? 50 : 45,
-                      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-                    ),
-                    child: NavigationBar(
-                      height: Platform.isIOS ? 50 : 45,
-                      elevation: 0,
-                      selectedIndex: _selectedIndex,
-                      backgroundColor: Colors.transparent,
-                      indicatorColor: (isDarkMode 
-                        ? Color.fromARGB(255, 246, 167, 63).withOpacity(0.7) 
-                        : Color.fromARGB(255, 246, 167, 63).withOpacity(0.7)
-                      ),
-                      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-                      onDestinationSelected: (index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      },
-                      destinations: [
-                        NavigationDestination(
-                          icon: Icon(Icons.home, size: _iconSize),
-                          label: '',
-                        ),
-                        NavigationDestination(
-                          icon: _buildNotificationIcon(friendRequestCount, Icons.people),
-                          label: '',
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.add_circle_outline, size: _iconSize),
-                          label: '',
-                        ),
-                        NavigationDestination(
-                          icon: _buildNotificationIcon(eventNotificationCount, Icons.notifications),
-                          label: '',
-                        ),
-                        NavigationDestination(
-                          icon: Icon(Icons.person, size: _iconSize),
-                          label: '',
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),
