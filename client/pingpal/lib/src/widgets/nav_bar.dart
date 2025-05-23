@@ -45,7 +45,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   late int _selectedIndex;
   final NotificationService _notificationService = NotificationService();
-  final double _iconSize = 24;
+  final double _iconSize = 28;
   
   @override
   void initState() {
@@ -123,11 +123,11 @@ class _NavBarState extends State<NavBar> {
                   child: NavigationBarTheme(
                     data: NavigationBarThemeData(
                       indicatorShape: StadiumBorder(),
-                      height: Platform.isIOS ? 65 : 60,
-                      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                      height: Platform.isIOS ? 50 : 45,
+                      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
                     ),
                     child: NavigationBar(
-                      height: Platform.isIOS ? 65 : 60,
+                      height: Platform.isIOS ? 50 : 45,
                       elevation: 0,
                       selectedIndex: _selectedIndex,
                       backgroundColor: Colors.transparent,
@@ -135,7 +135,7 @@ class _NavBarState extends State<NavBar> {
                         ? Color.fromARGB(255, 246, 167, 63).withOpacity(0.7) 
                         : Color.fromARGB(255, 246, 167, 63).withOpacity(0.7)
                       ),
-                      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
                       onDestinationSelected: (index) {
                         setState(() {
                           _selectedIndex = index;
@@ -144,23 +144,23 @@ class _NavBarState extends State<NavBar> {
                       destinations: [
                         NavigationDestination(
                           icon: Icon(Icons.home, size: _iconSize),
-                          label: 'Home',
+                          label: '',
                         ),
                         NavigationDestination(
                           icon: _buildNotificationIcon(friendRequestCount, Icons.people),
-                          label: 'Pals',
+                          label: '',
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.add_circle_outline, size: _iconSize),
-                          label: 'Ping',
+                          label: '',
                         ),
                         NavigationDestination(
                           icon: _buildNotificationIcon(eventNotificationCount, Icons.notifications),
-                          label: 'Your Pings',
+                          label: '',
                         ),
                         NavigationDestination(
                           icon: Icon(Icons.person, size: _iconSize),
-                          label: 'Profile',
+                          label: '',
                         ),
                       ],
                     ),
