@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';  // For BackdropFilter
+import 'dart:io';  // Add this for Platform check
 import 'package:pingpal/src/screens/create_ping_screen.dart';
 import 'package:pingpal/src/screens/friend_list_screen.dart';
 import 'package:pingpal/src/screens/home_screen.dart';
@@ -21,7 +23,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   late int _selectedIndex;
   final NotificationService _notificationService = NotificationService();
-  final double _iconSize = 30;
+  final double _iconSize = 24;
   
   @override
   void initState() {
@@ -31,7 +33,12 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
       body: IndexedStack(
         index: _selectedIndex,
         children: [
@@ -39,9 +46,7 @@ class _NavBarState extends State<NavBar> {
           PalsScreen(),
           CreateEventScreen(),
           EventsPage(),
-          ProfilePage(
-              themeNotifier:
-                  widget.themeNotifier), // Pass the themeNotifier here
+          ProfilePage(themeNotifier: widget.themeNotifier),
         ],
       ),
       bottomNavigationBar: Obx(() {
@@ -62,45 +67,95 @@ class _NavBarState extends State<NavBar> {
                 !notification.isRead)
             .length;
             
-        return BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home, size: _iconSize),
-              label: 'Home',
+        return SafeArea(
+          bottom: false,
+          child: Container(
+            color: Colors.transparent,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 8, 
+                right: 8, 
+                bottom: 8,
+                top: Platform.isIOS ? 50 : 0,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: (isDarkMode 
+                        ? Color(0xFF242424).withOpacity(0.5) 
+                        : Color(0xFFF3F0F7).withOpacity(0.5)
+                      ),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDarkMode 
+                            ? Colors.black.withOpacity(0.2) 
+                            : Colors.grey.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                      border: Border.all(
+                        color: isDarkMode 
+                          ? Colors.white.withOpacity(0.1) 
+                          : Colors.black.withOpacity(0.05),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: NavigationBarTheme(
+                      data: NavigationBarThemeData(
+                        indicatorShape: StadiumBorder(),
+                        height: 60,
+                        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                      ),
+                      child: NavigationBar(
+                        
+                        height: Platform.isIOS ? 50 : 70,
+                        elevation: 0,
+                        selectedIndex: _selectedIndex,
+                        backgroundColor: Colors.transparent,
+                        indicatorColor: (isDarkMode 
+                          ? Color.fromARGB(255, 246, 167, 63).withOpacity(0.7) 
+                          : Color.fromARGB(255, 246, 167, 63).withOpacity(0.7)
+                        ),
+                        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                        onDestinationSelected: (index) {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                        destinations: [
+                          NavigationDestination(
+                            icon: Icon(Icons.home, size: _iconSize),
+                            label: 'Home',
+                          ),
+                          NavigationDestination(
+                            icon: _buildNotificationIcon(friendRequestCount, Icons.people),
+                            label: 'Pals',
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.add_circle_outline, size: _iconSize),
+                            label: 'Ping',
+                          ),
+                          NavigationDestination(
+                            icon: _buildNotificationIcon(eventNotificationCount, Icons.notifications),
+                            label: 'Your Pings',
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.person, size: _iconSize),
+                            label: 'Profile',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: _buildNotificationIcon(friendRequestCount, Icons.people),
-              label: 'Pals',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle, size: _iconSize),
-              label: 'Ping',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNotificationIcon(eventNotificationCount, Icons.notifications),
-              label: 'Your Pings',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings, size: _iconSize),
-              label: 'Profile',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.yellow[700], // Yellow for selected item
-          unselectedItemColor:
-              widget.themeNotifier.isDarkMode ? Colors.grey : Colors.black54,
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
-          onTap: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          elevation: 10,
-          backgroundColor:
-              widget.themeNotifier.isDarkMode ? Color(0xFF242424) : Colors.white,
+          ),
         );
       }),
     );
@@ -111,34 +166,18 @@ class _NavBarState extends State<NavBar> {
       return Icon(icon, size: _iconSize);
     }
     
-    return Stack(
-      children: [
-        Icon(icon, size: _iconSize),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            constraints: BoxConstraints(
-              minWidth: 16,
-              minHeight: 16,
-            ),
-            child: Text(
-              count > 9 ? '9+' : count.toString(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
+    return Badge(
+      backgroundColor: Colors.red,
+      offset: Offset(10, -5),
+      label: Text(
+        count > 9 ? '9+' : count.toString(),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
         ),
-      ],
+      ),
+      child: Icon(icon, size: _iconSize),
     );
   }
 }
