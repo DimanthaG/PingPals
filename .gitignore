@@ -29,6 +29,18 @@ node_modules/
 
 # Firebase
 **/firebase-service-account.json
+**/firebase.json
+**/google-services.json
+**/GoogleService-Info.plist
+**/.firebase/
+**/firebase-debug.log
+**/firebase-debug.*.log
+**/firebase-export-*
+**/.firebaserc
+
+# Sensitive configuration folder
+Drag Drop/
+"Drag Drop"/
 
 # Keep backend and client folders
 !backend/
