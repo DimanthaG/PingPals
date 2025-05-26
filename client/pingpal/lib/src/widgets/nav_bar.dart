@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';  // For BackdropFilter
-import 'dart:io';  // Add this for Platform check
+import 'dart:ui'; // For BackdropFilter
+import 'dart:io'; // Add this for Platform check
 import 'package:pingpal/src/screens/create_ping_screen.dart';
 import 'package:pingpal/src/screens/friend_list_screen.dart';
 import 'package:pingpal/src/screens/home_screen.dart';
@@ -26,11 +26,13 @@ class NavBar extends StatefulWidget {
   final ThemeNotifier themeNotifier;
   final int initialTabIndex;
 
-  const NavBar({super.key, required this.themeNotifier, this.initialTabIndex = 0});
+  const NavBar(
+      {super.key, required this.themeNotifier, this.initialTabIndex = 0});
 
   // Get the total height including safe area
   static double getTotalNavBarHeight(BuildContext context) {
-    return NavBarPadding.getNavBarHeight(context) + MediaQuery.of(context).padding.bottom;
+    return NavBarPadding.getNavBarHeight(context) +
+        MediaQuery.of(context).padding.bottom;
   }
 
   // Helper method to get content padding
@@ -46,7 +48,7 @@ class _NavBarState extends State<NavBar> {
   late int _selectedIndex;
   final NotificationService _notificationService = NotificationService();
   final double _iconSize = 28;
-  
+
   @override
   void initState() {
     super.initState();
@@ -57,7 +59,7 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
@@ -74,24 +76,28 @@ class _NavBarState extends State<NavBar> {
       bottomNavigationBar: Obx(() {
         // Count friend request notifications for Pals tab
         final friendRequestCount = _notificationService.notifications
-            .where((notification) => 
-                notification.data['type']?.toString().contains('FRIEND_REQUEST') == true && 
+            .where((notification) =>
+                notification.data['type']
+                        ?.toString()
+                        .contains('FRIEND_REQUEST') ==
+                    true &&
                 !notification.isRead)
             .length;
-            
+
         // Count event notifications for Your Pings tab
         final eventNotificationCount = _notificationService.notifications
-            .where((notification) => 
-                (notification.data['type']?.toString().contains('EVENT_') == true || 
-                 notification.data['type'] == 'EVENT_INVITE' || 
-                 notification.data['type'] == 'EVENT_UPDATE' || 
-                 notification.data['type'] == 'EVENT_REMINDER') && 
+            .where((notification) =>
+                (notification.data['type']?.toString().contains('EVENT_') ==
+                        true ||
+                    notification.data['type'] == 'EVENT_INVITE' ||
+                    notification.data['type'] == 'EVENT_UPDATE' ||
+                    notification.data['type'] == 'EVENT_REMINDER') &&
                 !notification.isRead)
             .length;
-            
+
         return Container(
           padding: EdgeInsets.only(
-            left: 8, 
+            left: 8,
             right: 8,
             bottom: Platform.isIOS ? 0 : 8, // No bottom padding on iOS
           ),
@@ -101,24 +107,23 @@ class _NavBarState extends State<NavBar> {
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
                 decoration: BoxDecoration(
-                  color: (isDarkMode 
-                    ? Color(0xFF242424).withOpacity(0.5) 
-                    : Color(0xFFF3F0F7).withOpacity(0.5)
-                  ),
+                  color: (isDarkMode
+                      ? Color(0xFF242424).withOpacity(0.5)
+                      : Color(0xFFF3F0F7).withOpacity(0.5)),
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: isDarkMode 
-                        ? Colors.black.withOpacity(0.2) 
-                        : Colors.grey.withOpacity(0.2),
+                      color: isDarkMode
+                          ? Colors.black.withOpacity(0.2)
+                          : Colors.grey.withOpacity(0.2),
                       blurRadius: 10,
                       offset: Offset(0, 4),
                     ),
                   ],
                   border: Border.all(
-                    color: isDarkMode 
-                      ? Colors.white.withOpacity(0.1) 
-                      : Colors.black.withOpacity(0.05),
+                    color: isDarkMode
+                        ? Colors.white.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.05),
                     width: 0.5,
                   ),
                 ),
@@ -126,18 +131,19 @@ class _NavBarState extends State<NavBar> {
                   data: NavigationBarThemeData(
                     indicatorShape: StadiumBorder(),
                     height: 45, // Same height for both platforms
-                    labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+                    labelBehavior:
+                        NavigationDestinationLabelBehavior.alwaysHide,
                   ),
                   child: NavigationBar(
                     height: 45, // Same height for both platforms
                     elevation: 0,
                     selectedIndex: _selectedIndex,
                     backgroundColor: Colors.transparent,
-                    indicatorColor: (isDarkMode 
-                      ? Color.fromARGB(255, 246, 167, 63).withOpacity(0.7) 
-                      : Color.fromARGB(255, 246, 167, 63).withOpacity(0.7)
-                    ),
-                    labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+                    indicatorColor: (isDarkMode
+                        ? Color.fromARGB(255, 246, 167, 63).withOpacity(0.7)
+                        : Color.fromARGB(255, 246, 167, 63).withOpacity(0.7)),
+                    labelBehavior:
+                        NavigationDestinationLabelBehavior.alwaysHide,
                     onDestinationSelected: (index) {
                       setState(() {
                         _selectedIndex = index;
@@ -149,7 +155,8 @@ class _NavBarState extends State<NavBar> {
                         label: '',
                       ),
                       NavigationDestination(
-                        icon: _buildNotificationIcon(friendRequestCount, Icons.people),
+                        icon: _buildNotificationIcon(
+                            friendRequestCount, Icons.people),
                         label: '',
                       ),
                       NavigationDestination(
@@ -157,7 +164,8 @@ class _NavBarState extends State<NavBar> {
                         label: '',
                       ),
                       NavigationDestination(
-                        icon: _buildNotificationIcon(eventNotificationCount, Icons.notifications),
+                        icon: _buildNotificationIcon(
+                            eventNotificationCount, Icons.notifications),
                         label: '',
                       ),
                       NavigationDestination(
@@ -174,12 +182,12 @@ class _NavBarState extends State<NavBar> {
       }),
     );
   }
-  
+
   Widget _buildNotificationIcon(int count, IconData icon) {
     if (count == 0) {
       return Icon(icon, size: _iconSize);
     }
-    
+
     return Badge(
       backgroundColor: Colors.red,
       offset: Offset(10, -5),

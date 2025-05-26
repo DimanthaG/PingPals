@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pingpal/src/widgets/nav_bar.dart';
+import 'package:pingpal/src/widgets/animated_background.dart';
+import 'package:pingpal/src/widgets/custom_app_bar.dart';
+import 'package:pingpal/src/widgets/gradient_background.dart';
 
 class HomeScreen extends StatelessWidget with NavBarPadding {
   const HomeScreen({super.key});
@@ -10,139 +13,153 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'PingPals!',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onPrimary,
-          ),
-        ),
-        backgroundColor: isDarkMode
-            ? const Color(0xFFFF8C00) // Dark Mode Orange
-            : const Color(0xFFFF8C00), // Light Mode Yellow
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: NavBarPadding.getScreenPadding(context),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Material(
-                  elevation: 5,
-                  shadowColor: isDarkMode ? Colors.black54 : Colors.black12,
-                  borderRadius: BorderRadius.circular(30.0),
+      extendBodyBehindAppBar: true,
+      body: AnimatedBackground(
+        child: SingleChildScrollView(
+          padding: NavBarPadding.getScreenPadding(context),
+          child: Padding(
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 16.0,
+                left: 16.0,
+                right: 16.0,
+                bottom: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // PingPals Header
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF8C00).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.bolt,
+                          size: 24,
+                          color: Color(0xFFFF8C00),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'PingPals',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: const Color(0xFFFF8C00),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Search Bar
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.black.withOpacity(0.4),
+                  ),
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Search...',
-                      prefixIcon: Icon(Icons.search,
-                          color: isDarkMode ? Colors.white70 : Colors.black54),
-                      filled: true,
-                      fillColor:
-                          isDarkMode ? Colors.grey[800] : theme.cardColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 15.0),
+                      hintStyle: theme.textTheme.bodyMedium
+                          ?.copyWith(color: Colors.white54),
+                      prefixIcon:
+                          const Icon(Icons.search, color: Colors.white54),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 20),
                     ),
-                    style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black),
+                    style: theme.textTheme.bodyMedium
+                        ?.copyWith(color: Colors.white),
                   ),
                 ),
-              ),
+                const SizedBox(height: 16),
 
-              // Pinned Events Section
-              const SizedBox(height: 20),
-              Text(
-                'Pinned Events',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                // Pinned Events Section
+                Text(
+                  'Pinned Events',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: const Color(0xFFFF8C00),
+                  ),
                 ),
-              ),
-              Divider(
-                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                thickness: 1,
-                height: 20,
-              ),
-              const SizedBox(height: 10),
-              _buildPinnedEventCard(theme, isDarkMode),
+                Divider(
+                  color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                  thickness: 1,
+                  height: 20,
+                ),
+                const SizedBox(height: 10),
+                _buildPinnedEventCard(theme, isDarkMode),
 
-              // Upcoming Events Section
-              const SizedBox(height: 30),
-              _buildSectionHeader('Upcoming Events', theme, isDarkMode),
-              Divider(
-                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                thickness: 1,
-                height: 20,
-              ),
-              const SizedBox(height: 10),
-              _buildEventCard(
-                title: 'Deal!',
-                organizer: 'Geeneth Kulutunge',
-                timeLeft: '12:22',
-                participants: 'Nethma, Amantha, Dimantha, Hakkam',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                backgroundColor:
-                    isDarkMode ? Color(0xFFEA580C) : Color(0xFFFFB74D),
-                textColor: isDarkMode ? Colors.white : Colors.black,
-              ),
-              _buildEventCard(
-                title: 'QuickWit',
-                organizer: 'Roosanda',
-                timeLeft: '1:30:12',
-                participants: 'Nethma, Amantha, Dimantha',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                backgroundColor:
-                    isDarkMode ? Color(0xFFD81B60) : Color(0xFFF48FB1),
-                textColor: isDarkMode ? Colors.white : Colors.black,
-              ),
-              _buildEventCard(
-                title: 'Minecraft',
-                organizer: 'DimanthaG',
-                timeLeft: '20:32',
-                participants: 'Nethma',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                backgroundColor:
-                    isDarkMode ? Color(0xFFEF6C00) : Color(0xFFFFCC80),
-                textColor: isDarkMode ? Colors.white : Colors.black,
-              ),
+                // Upcoming Events Section
+                const SizedBox(height: 30),
+                _buildSectionHeader('Upcoming Events', theme, isDarkMode),
+                Divider(
+                  color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                  thickness: 1,
+                  height: 20,
+                ),
+                const SizedBox(height: 10),
+                _buildEventCard(
+                  title: 'Deal!',
+                  organizer: 'Geeneth Kulutunge',
+                  timeLeft: '12:22',
+                  participants: 'Nethma, Amantha, Dimantha, Hakkam',
+                  theme: theme,
+                  isDarkMode: isDarkMode,
+                  backgroundColor:
+                      isDarkMode ? Color(0xFFEA580C) : Color(0xFFFFB74D),
+                  textColor: Colors.white,
+                ),
+                _buildEventCard(
+                  title: 'QuickWit',
+                  organizer: 'Roosanda',
+                  timeLeft: '1:30:12',
+                  participants: 'Nethma, Amantha, Dimantha',
+                  theme: theme,
+                  isDarkMode: isDarkMode,
+                  backgroundColor:
+                      isDarkMode ? Color(0xFFD81B60) : Color(0xFFF48FB1),
+                  textColor: Colors.white,
+                ),
+                _buildEventCard(
+                  title: 'Minecraft',
+                  organizer: 'DimanthaG',
+                  timeLeft: '20:32',
+                  participants: 'Nethma',
+                  theme: theme,
+                  isDarkMode: isDarkMode,
+                  backgroundColor:
+                      isDarkMode ? Color(0xFFEF6C00) : Color(0xFFFFCC80),
+                  textColor: Colors.white,
+                ),
 
-              // Invited Events Section
-              const SizedBox(height: 30),
-              _buildSectionHeader('Invited Events', theme, isDarkMode),
-              Divider(
-                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                thickness: 1,
-                height: 20,
-              ),
-              const SizedBox(height: 10),
-              _buildHorizontalScrollableEventCards(theme, isDarkMode,
-                  isCreatedEvents: false),
+                // Invited Events Section
+                const SizedBox(height: 30),
+                _buildSectionHeader('Invited Events', theme, isDarkMode),
+                Divider(
+                  color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                  thickness: 1,
+                  height: 20,
+                ),
+                const SizedBox(height: 10),
+                _buildHorizontalScrollableEventCards(theme, isDarkMode,
+                    isCreatedEvents: false),
 
-              // Created Events Section
-              const SizedBox(height: 30),
-              _buildSectionHeader('Created Events', theme, isDarkMode),
-              Divider(
-                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                thickness: 1,
-                height: 20,
-              ),
-              const SizedBox(height: 10),
-              _buildHorizontalScrollableEventCards(theme, isDarkMode,
-                  isCreatedEvents: true),
-            ],
+                // Created Events Section
+                const SizedBox(height: 30),
+                _buildSectionHeader('Created Events', theme, isDarkMode),
+                Divider(
+                  color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                  thickness: 1,
+                  height: 20,
+                ),
+                const SizedBox(height: 10),
+                _buildHorizontalScrollableEventCards(theme, isDarkMode,
+                    isCreatedEvents: true),
+              ],
+            ),
           ),
         ),
       ),
@@ -150,31 +167,64 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
   }
 
   Widget _buildSectionHeader(String title, ThemeData theme, bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(Icons.calendar_today,
-                  color: isDarkMode ? Colors.white70 : Colors.black),
-              onPressed: () {
-                // Navigate to a detailed section view
-              },
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            const Color(0xFFFF8C00).withOpacity(0.1),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF8C00).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                title,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
+            child: Icon(
+              title.contains('Upcoming')
+                  ? Icons.event_available
+                  : title.contains('Invited')
+                      ? Icons.mail
+                      : Icons.create,
+              size: 22,
+              color: const Color(0xFFFF8C00),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: Colors.white,
               ),
             ),
-          ],
-        ),
-      ],
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: const Color(0xFFFF8C00).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: const Color(0xFFFF8C00),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -187,15 +237,21 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
         width: double.infinity,
         child: Container(
           decoration: BoxDecoration(
-            color: isDarkMode ? Color(0xFF7B1FA2) : Color(0xFFCE93D8),
+            color: Colors.grey[900]?.withOpacity(0.6),
             borderRadius: BorderRadius.circular(20.0),
             boxShadow: [
               BoxShadow(
-                color: isDarkMode ? Colors.black54 : Colors.black12,
+                color: isDarkMode
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.black.withOpacity(0.2),
                 blurRadius: 15,
                 offset: const Offset(0, 8),
               ),
             ],
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.0,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,34 +259,43 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
               Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDarkMode
-                        ? [Color(0xFF5E35B1), Color(0xFFBA68C8)]
-                        : [Color(0xFF6A1B9A), Color(0xFFBA68C8)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: Colors.grey[900]?.withOpacity(0.7),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
                   ),
                 ),
                 child: Row(
-                  children: const [
-                    Icon(Icons.discord, size: 40, color: Colors.white),
-                    Spacer(),
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.discord,
+                          size: 30, color: Colors.white),
+                    ),
+                    const Spacer(),
                     Text(
                       'Clubhouse',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: const Color(0xFFFF8C00),
                       ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.pin_drop,
+                          size: 20, color: Colors.white),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -242,39 +307,99 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
                         Text(
                           'Deal!',
                           style: theme.textTheme.headlineSmall?.copyWith(
-                              color: isDarkMode ? Colors.white : Colors.black),
+                            color: Colors.white,
+                          ),
                         ),
-                        Text(
-                          'in 12:22',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                              color: isDarkMode ? Colors.grey : Colors.black54),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(20),
+                            border:
+                                Border.all(color: Colors.red.withOpacity(0.5)),
+                          ),
+                          child: Text(
+                            'in 12:22',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Geeneth Kulutunge',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                          color: isDarkMode ? Colors.orange : Colors.blueAccent,
-                          fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildParticipantColumn(
-                            ['Amantha', 'Dimantha', 'Hakkam', 'Nethma'], theme),
-                        _buildParticipantColumn(
-                            ['Thulana', 'Geeneth', 'Sheveen', 'Autism'], theme),
+                        const Icon(Icons.person,
+                            size: 18, color: Color(0xFFFF8C00)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Geeneth Kulutunge',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: const Color(0xFFFF8C00),
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 12.0),
+                          vertical: 12, horizontal: 15),
                       decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.grey[800] : theme.cardColor,
+                        color: Colors.black.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.people,
+                                  size: 18,
+                                  color: Colors.white.withOpacity(0.7)),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Participants',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildParticipantColumn(
+                                  ['Amantha', 'Dimantha', 'Hakkam', 'Nethma'],
+                                  theme),
+                              _buildParticipantColumn(
+                                  ['Thulana', 'Geeneth', 'Sheveen', '+2 more'],
+                                  theme),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15.0, vertical: 10.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12.0),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -284,21 +409,26 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
                                 text: "Hey, I'll be a few minutes late",
                               ),
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black),
+                                color: Colors.white,
+                              ),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Leave a comment...',
-                                hintStyle: theme.textTheme.labelSmall?.copyWith(
-                                    color: isDarkMode
-                                        ? Colors.white54
-                                        : Colors.black54),
+                                hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white.withOpacity(0.5),
+                                ),
                               ),
                             ),
                           ),
-                          Icon(Icons.send,
-                              color:
-                                  isDarkMode ? Colors.white54 : Colors.black54),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const Icon(Icons.send,
+                                size: 20, color: Color(0xFFFF8C00)),
+                          ),
                         ],
                       ),
                     ),
@@ -321,9 +451,8 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: Text(
                 participant,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.secondary,
-                  fontWeight: FontWeight.w600,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -352,45 +481,72 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
           margin: const EdgeInsets.symmetric(vertical: 10.0),
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(20.0),
-            boxShadow: const [
+            color: Colors.grey[900]?.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
               BoxShadow(
-                color: Colors.black12,
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 15,
-                offset: Offset(0, 8),
+                offset: const Offset(0, 8),
               ),
             ],
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1.0,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style:
-                    theme.textTheme.headlineSmall?.copyWith(color: textColor),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.red.withOpacity(0.5)),
+                    ),
+                    child: Text(
+                      'in $timeLeft',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5),
-              Text(
-                organizer,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w600,
-                ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.person, size: 16, color: Color(0xFFFF8C00)),
+                  const SizedBox(width: 6),
+                  Text(
+                    organizer,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFFFF8C00),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5),
-              Text(
-                participants,
-                style: TextStyle(color: textColor.withOpacity(0.7)),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'in $timeLeft',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.redAccent,
-                ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: participants
+                    .split(', ')
+                    .map((name) => _buildParticipant(name, theme))
+                    .toList(),
               ),
             ],
           ),
@@ -399,32 +555,65 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
     );
   }
 
+  Widget _buildParticipant(String name, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        name,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
   Widget _buildHorizontalScrollableEventCards(ThemeData theme, bool isDarkMode,
       {required bool isCreatedEvents}) {
-    List<Color> eventColors = [
-      isDarkMode ? Colors.blue[800]! : Colors.blue[100]!,
-      isDarkMode ? Colors.green[800]! : Colors.green[100]!,
+    List<Map<String, String>> events = [
+      {
+        'title': 'Longlegs',
+        'date': '22/08/2024',
+        'time': '14:00',
+        'accepted': 'Geeneth',
+      },
+      {
+        'title': 'D&D Session',
+        'date': '25/08/2024',
+        'time': '20:00',
+        'accepted': 'Nethma, Amantha',
+      },
+      {
+        'title': 'Movie Night',
+        'date': '30/08/2024',
+        'time': '19:30',
+        'accepted': 'Dimantha, Hakkam',
+      },
     ];
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (int i = 0; i < 3; i++)
-            Container(
-              margin: const EdgeInsets.only(right: 10),
-              child: _buildEventCardSmall(
-                title: 'Longlegs',
-                date: '22/08/2024',
-                time: '14:00',
-                accepted: 'Geeneth',
-                theme: theme,
-                isDarkMode: isDarkMode,
-                cardColor: isCreatedEvents ? eventColors[1] : eventColors[0],
-                textColor: isDarkMode ? Colors.white : Colors.black87,
-              ),
-            ),
-        ],
+    return SizedBox(
+      height: 160,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: events.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) => _buildEventCardSmall(
+          title: events[index]['title']!,
+          date: events[index]['date']!,
+          time: events[index]['time']!,
+          accepted: events[index]['accepted']!,
+          theme: theme,
+          isDarkMode: isDarkMode,
+          cardColor: isCreatedEvents
+              ? (isDarkMode ? const Color(0xFF2E7D32) : const Color(0xFFA5D6A7))
+              : (isDarkMode
+                  ? const Color(0xFF1565C0)
+                  : const Color(0xFF90CAF9)),
+          textColor: Colors.white,
+        ),
       ),
     );
   }
@@ -439,51 +628,41 @@ class HomeScreen extends StatelessWidget with NavBarPadding {
     required Color cardColor,
     required Color textColor,
   }) {
-    return GestureDetector(
-      onTap: () {
-        // Handle small event card tap
-      },
-      child: SizedBox(
-        width: 200, // Adjusted width for horizontal scrolling
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 10.0),
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(20.0),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 15,
-                offset: Offset(0, 8),
-              ),
-            ],
+    return Container(
+      width: 200,
+      decoration: BoxDecoration(
+        color: Colors.grey[900]?.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: Colors.white,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: textColor,
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                '$date | $time',
-                style:
-                    theme.textTheme.bodyMedium?.copyWith(color: Colors.orange),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Accepted: $accepted',
-                style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
-              ),
-            ],
+          const SizedBox(height: 8),
+          Text(
+            '$date | $time',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: const Color(0xFFFF8C00).withOpacity(0.9),
+            ),
           ),
-        ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: accepted
+                .split(', ')
+                .map((name) => _buildParticipant(name, theme))
+                .toList(),
+          ),
+        ],
       ),
     );
   }
