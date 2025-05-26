@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:pingpal/src/widgets/nav_bar.dart';
+import 'package:pingpal/src/widgets/animated_background.dart';
+import 'package:pingpal/src/widgets/custom_app_bar.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
@@ -12,7 +14,8 @@ class CreateEventScreen extends StatefulWidget {
   _CreateEventScreenState createState() => _CreateEventScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPadding {
+class _CreateEventScreenState extends State<CreateEventScreen>
+    with NavBarPadding {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -186,7 +189,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPaddin
         print('Event Data: ${jsonEncode(event)}');
 
         final response = await http.post(
-          Uri.parse('https://pingpals-backend.onrender.com/addEvent'), // Ensure backend URL is correct
+          Uri.parse(
+              'https://pingpals-backend.onrender.com/addEvent'), // Ensure backend URL is correct
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $jwtToken',
@@ -221,155 +225,356 @@ class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPaddin
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     isDarkMode = theme.brightness == Brightness.dark;
-    final fillColor = isDarkMode ? Color(0xFF1E1E1E) : Colors.white;
-    final cardColor = isDarkMode ? Color(0xFF2A2A2A) : Colors.white;
-    final hintColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
-    final textColor = isDarkMode ? Colors.white : Colors.black;
-    final dividerColor = isDarkMode ? Colors.grey[700]! : Colors.grey[300]!;
+    final fillColor =
+        Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6);
+    final cardColor =
+        Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6);
+    final hintColor = Colors.white54;
+    final textColor = Colors.white;
+    final dividerColor = Colors.grey[700]!;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Create Ping',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onPrimary,
+      extendBodyBehindAppBar: true,
+      body: AnimatedBackground(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 16.0,
+            left: 16.0,
+            right: 16.0,
+            bottom: NavBarPadding.getNavBarHeight(context) + 16.0,
           ),
-        ),
-        backgroundColor: const Color(0xFFFF8C00),
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: NavBarPadding.getScreenPadding(context),
-        child: Form(
-          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildFullWidthCard(
-                theme,
-                cardColor,
-                child: TextFormField(
-                  controller: _titleController,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: textColor,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Event Title',
-                    hintStyle: TextStyle(color: hintColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide.none,
+              // Header with title
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF8C00).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.add_alert,
+                        size: 28,
+                        color: Color(0xFFFF8C00),
+                      ),
                     ),
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                    filled: true,
-                    fillColor: fillColor,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an event title';
-                    }
-                    return null;
-                  },
+                    const SizedBox(width: 14),
+                    Text(
+                      'Create Ping',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: const Color(0xFFFF8C00),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              _buildFullWidthCard(
-                theme,
-                cardColor,
-                child: TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 2,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: textColor,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Event Description',
-                    labelStyle: TextStyle(color: hintColor),
-                    hintStyle: TextStyle(color: hintColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildFullWidthCard(
+                      theme,
+                      cardColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Text(
+                              'Event Details',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: const Color(0xFFFF8C00),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          TextFormField(
+                            controller: _titleController,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: textColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'Event Title',
+                              hintStyle: TextStyle(color: hintColor),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 15),
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.3),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an event title';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _descriptionController,
+                            maxLines: 3,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: textColor,
+                              fontSize: 16,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: 'Event Description',
+                              labelStyle:
+                                  TextStyle(color: hintColor, fontSize: 16),
+                              hintStyle: TextStyle(color: hintColor),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.3),
+                              contentPadding: const EdgeInsets.all(15),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an event description';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                    filled: true,
-                    fillColor: fillColor,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an event description';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Date Picker Input
-              _buildFullWidthCard(
-                theme,
-                cardColor,
-                child: TextFormField(
-                  controller: _dateController,
-                  decoration: InputDecoration(
-                    labelText: 'Event Date',
-                    hintText: 'YYYY-MM-DD',
-                    hintStyle: TextStyle(color: hintColor),
-                    suffixIcon: Icon(Icons.calendar_today),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                    const SizedBox(height: 24),
+                    // Date Picker Input
+                    _buildSectionHeader('Date & Time', theme, isDarkMode),
+                    const SizedBox(height: 16),
+                    _buildFullWidthCard(
+                      theme,
+                      cardColor,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _dateController,
+                            decoration: InputDecoration(
+                              labelText: 'Event Date',
+                              labelStyle:
+                                  TextStyle(color: hintColor, fontSize: 16),
+                              hintText: 'YYYY-MM-DD',
+                              hintStyle: TextStyle(color: hintColor),
+                              suffixIcon: Icon(Icons.calendar_today,
+                                  color: const Color(0xFFFF8C00)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.3),
+                              contentPadding: const EdgeInsets.all(15),
+                            ),
+                            readOnly: true,
+                            onTap: _selectDate,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select a date';
+                              }
+                              return null;
+                            },
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(color: textColor, fontSize: 16),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _startTimeController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Start Time',
+                                    labelStyle: TextStyle(
+                                        color: hintColor, fontSize: 16),
+                                    hintStyle: TextStyle(color: hintColor),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    suffixIcon: Icon(Icons.access_time,
+                                        color: const Color(0xFFFF8C00)),
+                                    filled: true,
+                                    fillColor: Colors.black.withOpacity(0.3),
+                                    contentPadding: const EdgeInsets.all(15),
+                                  ),
+                                  readOnly: true,
+                                  onTap: () => _selectTime(isStartTime: true),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please select a start time';
+                                    }
+                                    return null;
+                                  },
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: textColor, fontSize: 16),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0),
+                                child: Text(
+                                  'to',
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _endTimeController,
+                                  decoration: InputDecoration(
+                                    labelText: 'End Time',
+                                    labelStyle: TextStyle(
+                                        color: hintColor, fontSize: 16),
+                                    hintStyle: TextStyle(color: hintColor),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    suffixIcon: Icon(Icons.access_time,
+                                        color: const Color(0xFFFF8C00)),
+                                    filled: true,
+                                    fillColor: Colors.black.withOpacity(0.3),
+                                    contentPadding: const EdgeInsets.all(15),
+                                  ),
+                                  readOnly: true,
+                                  onTap: () => _selectTime(isStartTime: false),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please select an end time';
+                                    }
+                                    return null;
+                                  },
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: textColor, fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    filled: true,
-                    fillColor: fillColor,
-                  ),
-                  readOnly: true,
-                  onTap: _selectDate,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a date';
-                    }
-                    return null;
-                  },
-                  style:
-                      theme.textTheme.bodyMedium?.copyWith(color: textColor),
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildLocationSection(theme, textColor, hintColor, fillColor),
-              const SizedBox(height: 20),
-              _buildTimeAndCapacitySection(theme, textColor, hintColor),
-              const SizedBox(height: 20),
-              _buildInvitePalsSection(theme, cardColor, dividerColor),
-              const SizedBox(height: 20),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _createEvent,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.yellow[700],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('Location', theme, isDarkMode),
+                    const SizedBox(height: 16),
+                    _buildLocationSection(
+                        theme, textColor, hintColor, fillColor),
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('Capacity', theme, isDarkMode),
+                    const SizedBox(height: 16),
+                    _buildCapacitySection(theme, textColor, fillColor),
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('Invite Pals', theme, isDarkMode),
+                    const SizedBox(height: 16),
+                    _buildInvitePalsSection(theme, cardColor, dividerColor),
+                    const SizedBox(height: 32),
+                    Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF8C00),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFF8C00).withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        width: 200,
+                        height: 55,
+                        child: ElevatedButton(
+                          onPressed: _createEvent,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: const Text(
+                            'Ping!',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 24,
-                    ),
-                  ),
-                  child: const Text(
-                    'Ping!',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, ThemeData theme, bool isDarkMode) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            const Color(0xFFFF8C00).withOpacity(0.1),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF8C00).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              title == 'Date & Time'
+                  ? Icons.access_time
+                  : title == 'Location'
+                      ? Icons.location_on
+                      : title == 'Capacity'
+                          ? Icons.people
+                          : Icons.person_add,
+              size: 22,
+              color: const Color(0xFFFF8C00),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -381,20 +586,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPaddin
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          if (!isDarkMode)
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, 5),
-            ),
-          if (isDarkMode)
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10,
-              offset: Offset(0, 5),
-            ),
-        ],
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1.0,
+        ),
       ),
       padding: const EdgeInsets.all(16.0),
       child: child,
@@ -403,53 +598,49 @@ class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPaddin
 
   Widget _buildLocationSection(
       ThemeData theme, Color textColor, Color? hintColor, Color fillColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Event Location',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: textColor,
+    return _buildFullWidthCard(
+      theme,
+      fillColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildLocationIconButton(
+                  theme, Icons.discord, 0, 'Discord', isDarkMode),
+              _buildLocationIconButton(
+                  theme, Icons.map, 1, 'Google Maps', isDarkMode),
+              _buildLocationIconButton(
+                  theme, Icons.videocam, 2, 'Zoom', isDarkMode),
+            ],
           ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildLocationIconButton(
-                theme, Icons.discord, 0, 'Discord', isDarkMode),
-            _buildLocationIconButton(
-                theme, Icons.map, 1, 'Google Maps', isDarkMode),
-            _buildLocationIconButton(
-                theme, Icons.videocam, 2, 'Zoom', isDarkMode),
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (_selectedLocationType == 0)
-          _buildFullWidthCard(
-            theme,
-            fillColor,
-            child: TextFormField(
-              controller: _discordServerNameController,
-              decoration: InputDecoration(
-                hintText: 'Enter Discord Server Name',
-                hintStyle: TextStyle(color: hintColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+          const SizedBox(height: 20),
+          if (_selectedLocationType == 0)
+            Column(
+              children: [
+                TextFormField(
+                  controller: _discordServerNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter Discord Server Name',
+                    hintStyle: TextStyle(color: hintColor, fontSize: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.black.withOpacity(0.3),
+                    contentPadding: const EdgeInsets.all(15),
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: textColor,
+                    fontSize: 16,
+                  ),
                 ),
-                filled: true,
-                fillColor: fillColor,
-              ),
-              style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+                const SizedBox(height: 16),
+              ],
             ),
-          ),
-        const SizedBox(height: 10),
-        _buildFullWidthCard(
-          theme,
-          fillColor,
-          child: TextFormField(
+          TextFormField(
             controller: _selectedLocationType == 0
                 ? _discordServerController
                 : _selectedLocationType == 1
@@ -461,174 +652,143 @@ class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPaddin
                   : _selectedLocationType == 1
                       ? 'Paste Google Maps Link...'
                       : 'Enter Zoom Room Code...',
-              hintStyle: TextStyle(color: hintColor),
+              hintStyle: TextStyle(color: hintColor, fontSize: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: fillColor,
+              fillColor: Colors.black.withOpacity(0.3),
+              contentPadding: const EdgeInsets.all(15),
             ),
-            style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: textColor,
+              fontSize: 16,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildTimeAndCapacitySection(
-      ThemeData theme, Color textColor, Color? hintColor) {
-    return Column(
-      children: [
-        _buildFullWidthCard(
-          theme,
-          theme.cardColor,
-          child: Row(
+  Widget _buildCapacitySection(
+      ThemeData theme, Color textColor, Color fillColor) {
+    return _buildFullWidthCard(
+      theme,
+      fillColor,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _startTimeController,
-                  decoration: InputDecoration(
-                    labelText: 'Start Time',
-                    labelStyle: TextStyle(color: hintColor),
-                    hintStyle: TextStyle(color: hintColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: Icon(Icons.access_time),
-                    filled: true,
-                    fillColor: theme.cardColor,
-                  ),
-                  readOnly: true,
-                  onTap: () => _selectTime(isStartTime: true),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a start time';
-                    }
-                    return null;
-                  },
-                  style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
-                ),
-              ),
-              const SizedBox(width: 10),
               Text(
-                'to',
+                'Participants Limit:',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
                   color: textColor,
                 ),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextFormField(
-                  controller: _endTimeController,
-                  decoration: InputDecoration(
-                    labelText: 'End Time',
-                    labelStyle: TextStyle(color: hintColor),
-                    hintStyle: TextStyle(color: hintColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: Icon(Icons.access_time),
-                    filled: true,
-                    fillColor: theme.cardColor,
-                  ),
-                  readOnly: true,
-                  onTap: () => _selectTime(isStartTime: false),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select an end time';
-                    }
-                    return null;
-                  },
-                  style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF8C00).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          'Capacity',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-        const SizedBox(height: 10),
-        _buildFullWidthCard(
-          theme,
-          theme.cardColor,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
                 child: Text(
                   '$_capacity',
-                  style: theme.textTheme.bodyLarge?.copyWith(color: textColor),
-                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFFF8C00),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              Slider(
-                value: _capacity.toDouble(),
-                min: 1,
-                max: 100,
-                divisions: 99,
-                activeColor: theme.colorScheme.secondary,
-                inactiveColor: theme.colorScheme.secondary.withOpacity(0.3),
-                label: '$_capacity',
-                onChanged: (double value) {
-                  setState(() {
-                    _capacity = value.toInt();
-                  });
-                },
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 10),
+          SliderTheme(
+            data: SliderThemeData(
+              trackHeight: 6,
+              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
+              overlayShape: RoundSliderOverlayShape(overlayRadius: 20),
+            ),
+            child: Slider(
+              value: _capacity.toDouble(),
+              min: 1,
+              max: 100,
+              divisions: 99,
+              activeColor: const Color(0xFFFF8C00),
+              inactiveColor: const Color(0xFFFF8C00).withOpacity(0.3),
+              label: '$_capacity',
+              onChanged: (double value) {
+                setState(() {
+                  _capacity = value.toInt();
+                });
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildInvitePalsSection(
       ThemeData theme, Color cardColor, Color dividerColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Invite Pals',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 10),
-        _buildFullWidthCard(
-          theme,
-          cardColor,
-          child: Container(
-            height: 300,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: ListView(
-              children: [
-                _buildFriendChip('Dimantha', theme, isDarkMode, dividerColor,
-                    accepted: true),
-                _buildFriendChip('Nethma', theme, isDarkMode, dividerColor),
-                _buildFriendChip('Amantha', theme, isDarkMode, dividerColor,
-                    accepted: true),
-                _buildFriendChip('Hakkam', theme, isDarkMode, dividerColor),
-                _buildFriendChip('Roosanda', theme, isDarkMode, dividerColor,
-                    accepted: true),
-                _buildFriendChip('Sheveen', theme, isDarkMode, dividerColor),
-                _buildFriendChip('Adheeb', theme, isDarkMode, dividerColor),
-                _buildFriendChip('Thulana', theme, isDarkMode, dividerColor),
-              ],
+    return _buildFullWidthCard(
+      theme,
+      cardColor,
+      child: Container(
+        height: 300,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.search,
+                    color: Colors.white54,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Search for friends...',
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildFriendChip('Dimantha', theme, isDarkMode, dividerColor,
+                      accepted: true),
+                  _buildFriendChip('Nethma', theme, isDarkMode, dividerColor),
+                  _buildFriendChip('Amantha', theme, isDarkMode, dividerColor,
+                      accepted: true),
+                  _buildFriendChip('Hakkam', theme, isDarkMode, dividerColor),
+                  _buildFriendChip('Roosanda', theme, isDarkMode, dividerColor,
+                      accepted: true),
+                  _buildFriendChip('Sheveen', theme, isDarkMode, dividerColor),
+                  _buildFriendChip('Adheeb', theme, isDarkMode, dividerColor),
+                  _buildFriendChip('Thulana', theme, isDarkMode, dividerColor),
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -636,41 +796,99 @@ class _CreateEventScreenState extends State<CreateEventScreen> with NavBarPaddin
       String name, ThemeData theme, bool isDarkMode, Color dividerColor,
       {bool accepted = false}) {
     final chipColor = accepted
-        ? theme.colorScheme.secondary.withOpacity(0.2)
-        : (isDarkMode ? Color(0xFF2A2A2A) : theme.cardColor);
-    final textColor = isDarkMode ? Colors.white : Colors.black;
+        ? const Color(0xFFFF8C00).withOpacity(0.2)
+        : Colors.grey[800]?.withOpacity(0.4) ?? Colors.black.withOpacity(0.4);
+    final textColor = Colors.white;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 4),
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: chipColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: dividerColor),
-      ),
-      child: Text(
-        name,
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: textColor,
+        border: Border.all(
+          color: accepted
+              ? const Color(0xFFFF8C00).withOpacity(0.3)
+              : Colors.white.withOpacity(0.1),
         ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: Colors.white.withOpacity(0.2),
+                child: Text(
+                  name[0],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                name,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+              ),
+            ],
+          ),
+          Icon(
+            accepted ? Icons.check_circle : Icons.add_circle_outline,
+            color: accepted ? const Color(0xFFFF8C00) : Colors.white54,
+            size: 20,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildLocationIconButton(ThemeData theme, IconData icon, int index,
       String tooltip, bool isDarkMode) {
-    return IconButton(
-      tooltip: tooltip,
-      icon: Icon(icon),
-      color: _selectedLocationType == index
-          ? theme.colorScheme.secondary
-          : (isDarkMode ? Colors.grey[400] : theme.iconTheme.color),
-      onPressed: () {
-        setState(() {
-          _selectedLocationType = index;
-        });
-      },
+    return Container(
+      decoration: BoxDecoration(
+        color: _selectedLocationType == index
+            ? const Color(0xFFFF8C00).withOpacity(0.2)
+            : Colors.grey[800]?.withOpacity(0.2) ??
+                Colors.black.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _selectedLocationType == index
+              ? const Color(0xFFFF8C00).withOpacity(0.3)
+              : Colors.transparent,
+        ),
+      ),
+      child: IconButton(
+        tooltip: tooltip,
+        icon: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon),
+            const SizedBox(height: 4),
+            Text(
+              tooltip,
+              style: TextStyle(
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+        iconSize: 24,
+        color: _selectedLocationType == index
+            ? const Color(0xFFFF8C00)
+            : Colors.white54,
+        onPressed: () {
+          setState(() {
+            _selectedLocationType = index;
+          });
+        },
+      ),
     );
   }
 }

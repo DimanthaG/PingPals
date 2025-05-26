@@ -3,6 +3,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pingpal/theme/theme_notifier.dart';
 import 'package:pingpal/src/widgets/nav_bar.dart';
+import 'package:pingpal/src/widgets/animated_background.dart';
+import 'package:pingpal/src/widgets/custom_app_bar.dart';
 
 class ProfilePage extends StatelessWidget with NavBarPadding {
   final ThemeNotifier themeNotifier;
@@ -14,34 +16,143 @@ class ProfilePage extends StatelessWidget with NavBarPadding {
     bool isDarkMode = themeNotifier.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Color(0xFF121212) : Colors.white,
-      body: Column(
-        children: [
-          _buildProfileHeader(isDarkMode),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.only(
-                top: 16.0,
-                left: 16.0,
-                right: 16.0,
-                bottom: NavBarPadding.getNavBarHeight(context) + MediaQuery.of(context).padding.bottom + 16.0,
-              ),
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildStatCard('Events Attended', '27', Colors.orangeAccent),
-                    _buildStatCard('Events Created', '14', Colors.greenAccent),
-                  ],
+      extendBodyBehindAppBar: true,
+      body: AnimatedBackground(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + 16.0,
+                  left: 16.0,
+                  right: 16.0,
+                  bottom: NavBarPadding.getNavBarHeight(context) +
+                      MediaQuery.of(context).padding.bottom +
+                      16.0,
                 ),
-                const SizedBox(height: 16.0),
-                _buildPremiumTile(),
-                const SizedBox(height: 16.0),
-                _buildSwitchTile('Change Theme', themeNotifier, isDarkMode),
-                _buildOptionTile('Blocked List', Icons.block, isDarkMode),
-                _buildLogoutTile(isDarkMode, context),
-                const SizedBox(height: 16.0),
-              ],
+                children: [
+                  // Header with title
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF8C00).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.person,
+                            size: 28,
+                            color: Color(0xFFFF8C00),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Text(
+                          'Profile',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                color: const Color(0xFFFF8C00),
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  _buildProfileHeader(isDarkMode),
+                  const SizedBox(height: 24.0),
+                  _buildSectionHeader('Stats', context),
+                  const SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildStatCard(
+                          'Events Attended', '27', const Color(0xFFFF8C00)),
+                      _buildStatCard(
+                          'Events Created', '14', const Color(0xFF6ECF68)),
+                    ],
+                  ),
+                  const SizedBox(height: 24.0),
+                  _buildSectionHeader('Membership', context),
+                  const SizedBox(height: 16.0),
+                  _buildPremiumTile(),
+                  const SizedBox(height: 24.0),
+                  _buildSectionHeader('Settings', context),
+                  const SizedBox(height: 16.0),
+                  _buildSwitchTile('Change Theme', themeNotifier, isDarkMode),
+                  const SizedBox(height: 12.0),
+                  _buildOptionTile('Blocked List', Icons.block, isDarkMode),
+                  const SizedBox(height: 24.0),
+                  _buildLogoutTile(isDarkMode, context),
+                  const SizedBox(height: 16.0),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            const Color(0xFFFF8C00).withOpacity(0.1),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF8C00).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              title == 'Stats'
+                  ? Icons.bar_chart
+                  : title == 'Membership'
+                      ? Icons.card_membership
+                      : Icons.settings,
+              size: 22,
+              color: const Color(0xFFFF8C00),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: const Color(0xFFFF8C00).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Color(0xFFFF8C00),
             ),
           ),
         ],
@@ -52,44 +163,122 @@ class ProfilePage extends StatelessWidget with NavBarPadding {
   Widget _buildProfileHeader(bool isDarkMode) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40.0),
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFFFA726), Color(0xFFFF7043)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+        color:
+            Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1.0,
         ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30.0),
-          bottomRight: Radius.circular(30.0),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          const Padding(padding: EdgeInsets.only(top: 8.0)),
-          Center(
-            child: Text(
-              'Profile',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFFFF8C00).withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                  child: const Icon(
+                    Icons.person,
+                    size: 70,
+                    color: Color(0xFFFF8C00),
+                  ),
+                ),
               ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF8C00),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20.0),
+          const Text(
+            'GeenethK',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          const Text(
+            'geeneth@example.com',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
             ),
           ),
           const SizedBox(height: 16.0),
-          CircleAvatar(
-            radius: 48,
-            backgroundColor: Colors.white,
-            child: Icon(Icons.person, size: 50, color: Color(0xFFFFA726)),
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            'GeenethK',
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF8C00).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: const Color(0xFFFF8C00).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.workspace_premium,
+                  color: Color(0xFFFF8C00),
+                  size: 20,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Premium Member',
+                  style: TextStyle(
+                    color: Color(0xFFFF8C00),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -100,36 +289,113 @@ class ProfilePage extends StatelessWidget with NavBarPadding {
   Widget _buildPremiumTile() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: Colors.yellow[700],
-        borderRadius: BorderRadius.circular(12.0),
+        color:
+            Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: const Color(0xFFFF8C00).withOpacity(0.3),
+          width: 1.0,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 6,
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Upgrade to Premium\n1 Month Free Trial',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Colors.black,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF8C00).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.workspace_premium,
+                  color: Color(0xFFFF8C00),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Premium Membership',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Access to exclusive features',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white54,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          Text(
-            '1.99 CAD/month',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Colors.black,
-            ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Current Plan',
+                    style: TextStyle(
+                      color: Colors.white54,
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Monthly',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF8C00),
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF8C00).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  '1.99 CAD/month',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -138,37 +404,61 @@ class ProfilePage extends StatelessWidget with NavBarPadding {
 
   Widget _buildStatCard(String title, String count, Color color) {
     return Container(
-      width: 140,
-      padding: const EdgeInsets.all(16.0),
+      width: 150,
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12.0),
+        color:
+            Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1.0,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: color.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              title.contains('Attended')
+                  ? Icons.event
+                  : Icons.create_new_folder,
+              color: color,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Text(
+            count,
+            style: TextStyle(
+              color: color,
+              fontSize: 32.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8.0),
           Text(
             title,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 14.0,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            count,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28.0,
-              fontWeight: FontWeight.bold,
+              fontSize: 16.0,
             ),
           ),
         ],
@@ -177,25 +467,55 @@ class ProfilePage extends StatelessWidget with NavBarPadding {
   }
 
   Widget _buildOptionTile(String title, IconData icon, bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6.0),
+      decoration: BoxDecoration(
+        color:
+            Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
-        leading:
-            Icon(icon, color: isDarkMode ? Colors.white70 : Colors.black54),
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
         title: Text(
           title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
             fontSize: 16.0,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: Colors.white,
           ),
         ),
-        tileColor: isDarkMode ? Color(0xFF424242) : Colors.white,
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.white54,
+          size: 16,
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(16.0),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
         onTap: () {
           // Handle navigation to Blocked List or other options
         },
@@ -205,19 +525,47 @@ class ProfilePage extends StatelessWidget with NavBarPadding {
 
   Widget _buildSwitchTile(
       String title, ThemeNotifier themeNotifier, bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: Icon(
-          Icons.brightness_6,
-          color: isDarkMode ? Colors.white70 : Colors.black54,
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6.0),
+      decoration: BoxDecoration(
+        color:
+            Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1.0,
         ),
-        title: Text(
-          title,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: const Icon(
+            Icons.brightness_6,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+        title: const Text(
+          'Dark Mode',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
             fontSize: 16.0,
-            color: isDarkMode ? Colors.white : Colors.black,
+            color: Colors.white,
           ),
         ),
         trailing: Switch(
@@ -225,35 +573,66 @@ class ProfilePage extends StatelessWidget with NavBarPadding {
           onChanged: (value) {
             themeNotifier.toggleTheme();
           },
+          activeColor: const Color(0xFFFF8C00),
+          activeTrackColor: const Color(0xFFFF8C00).withOpacity(0.3),
         ),
-        tileColor: isDarkMode ? Color(0xFF424242) : Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(16.0),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       ),
     );
   }
 
   Widget _buildLogoutTile(bool isDarkMode, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6.0),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: Colors.red.withOpacity(0.3),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.red.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.red.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: const Icon(
+            Icons.logout,
+            color: Colors.red,
+            size: 24,
+          ),
+        ),
         title: const Text(
           'Logout',
-          textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+            color: Colors.red,
+            fontWeight: FontWeight.w500,
             fontSize: 16.0,
           ),
         ),
-        tileColor: Colors.redAccent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(16.0),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
         onTap: () async {
           await _handleLogout(context);
         },

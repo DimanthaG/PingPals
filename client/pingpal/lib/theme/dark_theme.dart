@@ -1,43 +1,121 @@
 import 'package:flutter/material.dart';
 
-final ThemeData darkTheme = ThemeData(
-  useMaterial3: true,
+final darkTheme = ThemeData(
   brightness: Brightness.dark,
-  scaffoldBackgroundColor:
-      Color.fromARGB(255, 36, 36, 36), // Matching background color
-  appBarTheme: AppBarTheme(
-    color: Color(0xFFFFD600), // Yellow accent color
-    iconTheme: IconThemeData(color: Colors.black), // Dark icon color
-    titleTextStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+  scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+  primaryColor: const Color(0xFFFF8C00),
+  fontFamily: 'Poppins',
+  colorScheme: const ColorScheme.dark(
+    primary: Color(0xFFFF8C00),
+    secondary: Color.fromARGB(255, 185, 58, 3),
+    surface: Color(0xFF1A1A1A),
+    background: Color(0xFF1A1A1A),
+    error: Colors.red,
+    onPrimary: Colors.white,
+    onSecondary: Colors.white,
+    onSurface: Colors.white,
+    onBackground: Colors.white,
+    onError: Colors.white,
   ),
-  cardColor: Color(0xFF1F1F1F), // Slightly lighter dark for cards
-  colorScheme: ColorScheme.dark(
-    primary: Color(0xFFFFD600), // Yellow primary color
-    secondary: Color(0xFFFFD600), // Yellow accent color
-  ),
-  sliderTheme: SliderThemeData(
-    activeTrackColor: Color(0xFFFFD600),
-    inactiveTrackColor: Color(0xFFFFD600).withOpacity(0.3),
-    thumbColor: Color(0xFFFFD600),
-  ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      foregroundColor: Colors.black,
-      backgroundColor: Color(0xFFFFD600), // Button background color
+  cardColor: Colors.grey[900]?.withOpacity(0.3),
+  dividerColor: Colors.grey[800],
+  textTheme: const TextTheme(
+    headlineLarge: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white,
+      fontSize: 30,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.3,
+    ),
+    headlineMedium: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white,
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.2,
+    ),
+    headlineSmall: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white,
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.1,
+    ),
+    titleLarge: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white,
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+    ),
+    titleMedium: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white,
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+    ),
+    bodyLarge: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white,
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+    ),
+    bodyMedium: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white70,
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+    ),
+    bodySmall: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white54,
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+    ),
+    labelLarge: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
     ),
   ),
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    backgroundColor: Color(0xFF121212),
-    selectedItemColor: Color(0xFFFFD600),
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: Colors.grey[900]?.withOpacity(0.3),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(30),
+      borderSide: BorderSide.none,
+    ),
+    hintStyle: const TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.white54,
+      fontWeight: FontWeight.w400,
+    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+  ),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    backgroundColor: Colors.transparent,
+    selectedItemColor: Color(0xFFFF8C00),
     unselectedItemColor: Colors.grey,
+    type: BottomNavigationBarType.fixed,
+    elevation: 0,
   ),
-  textTheme: TextTheme(
-    headlineSmall: TextStyle(
-        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 28),
-    bodyLarge: TextStyle(color: Colors.white, fontSize: 18),
-    bodyMedium: TextStyle(color: Colors.white),
-    bodySmall: TextStyle(color: Colors.grey[400]),
-    labelSmall: TextStyle(color: Colors.grey[400]), // Placeholder text style
+  cardTheme: CardTheme(
+    color: Colors.grey[900]?.withOpacity(0.3),
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15),
+    ),
   ),
-  iconTheme: IconThemeData(color: Colors.grey[400]),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    centerTitle: true,
+    titleTextStyle: TextStyle(
+      fontFamily: 'Poppins',
+      color: Color(0xFFFF8C00),
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.5,
+    ),
+  ),
 );

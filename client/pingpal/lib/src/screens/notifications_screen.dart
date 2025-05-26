@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pingpal/src/widgets/nav_bar.dart';
+import 'package:pingpal/src/widgets/animated_background.dart';
 
 void main() {
   runApp(MyApp());
@@ -85,84 +86,193 @@ class _EventsPageState extends State<EventsPage> with NavBarPadding {
             .toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1E), // Dark background color
-      body: Column(
-        children: [
-          // Top blue section with rounded bottom corners and "Events" title
-          Container(
-            decoration: const BoxDecoration(
-              color: const Color(0xFFFF8C00),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-            ),
-            padding:
-                const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Padding above "Events"
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 16.0, top: 8.0),
-                  child: Center(
-                    child: Text(
-                      'Events',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+      extendBodyBehindAppBar: true,
+      body: AnimatedBackground(
+        child: Column(
+          children: [
+            // Top spacing for status bar
+            SizedBox(height: MediaQuery.of(context).padding.top),
+
+            // Header section with title
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF8C00).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.notifications,
+                      size: 28,
+                      color: Color(0xFFFF8C00),
                     ),
                   ),
+                  const SizedBox(width: 14),
+                  Text(
+                    'Notifications',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Section header with filters
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: _buildSectionHeader('Upcoming Events', context),
+            ),
+
+            // Search bar
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  color: Colors.grey[900]?.withOpacity(0.6) ??
+                      Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                // Search bar
-                TextField(
+                child: TextField(
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                        horizontal: 20, vertical: 15),
                     filled: true,
-                    fillColor: Colors.white,
-                    prefixIcon: const Icon(Icons.search, color: Colors.black54),
-                    hintText: 'Search...',
+                    fillColor: Colors.transparent,
+                    prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                    hintText: 'Search events...',
                     hintStyle:
-                        const TextStyle(color: Colors.black54, fontSize: 16),
+                        const TextStyle(color: Colors.white54, fontSize: 16),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
                     ),
                   ),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
                 ),
-                const SizedBox(height: 16),
-                // Filter chips
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildFilterButton(
-                        'Created', const Color(0xFFFFA400)), // Orange
-                    _buildFilterButton(
-                        'Invited', const Color(0xFFF37A90)), // Pink
-                    _buildFilterButton(
-                        'Accepted', const Color(0xFF6ECF68)), // Green
-                    _buildFilterButton(
-                        'Declined', const Color(0xFFD95555)), // Red
-                  ],
+              ),
+            ),
+
+            // Filter chips
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildFilterButton(
+                      'Created', const Color(0xFFFFA400)), // Orange
+                  _buildFilterButton(
+                      'Invited', const Color(0xFFF37A90)), // Pink
+                  _buildFilterButton(
+                      'Accepted', const Color(0xFF6ECF68)), // Green
+                  _buildFilterButton(
+                      'Declined', const Color(0xFFD95555)), // Red
+                ],
+              ),
+            ),
+
+            // Event cards list
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.only(
+                  top: 10,
+                  left: 16,
+                  right: 16,
+                  bottom: NavBarPadding.getNavBarHeight(context) + 16.0,
                 ),
-              ],
+                itemCount: _filteredEvents.length,
+                itemBuilder: (context, index) {
+                  final event = _filteredEvents[index];
+                  return _buildEventCard(
+                    event['title'],
+                    event['subtitle'],
+                    event['time'],
+                    event['color'],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8, top: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            const Color(0xFFFF8C00).withOpacity(0.1),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF8C00).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.event_available,
+              size: 22,
+              color: Color(0xFFFF8C00),
             ),
           ),
-          // Event cards list
+          const SizedBox(width: 12),
           Expanded(
-            child: ListView(
-              padding: NavBarPadding.getScreenPadding(context),
-              children: _filteredEvents.map((event) {
-                return _buildEventCard(
-                  event['title'],
-                  event['subtitle'],
-                  event['time'],
-                  event['color'],
-                );
-              }).toList(),
+            child: Text(
+              title,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: const Color(0xFFFF8C00).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Color(0xFFFF8C00),
             ),
           ),
         ],
@@ -183,20 +293,34 @@ class _EventsPageState extends State<EventsPage> with NavBarPadding {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: color,
+          color: color.withOpacity(_selectedFilterColor == color ? 0.8 : 0.4),
           borderRadius: BorderRadius.circular(20),
-          border: _selectedFilterColor == color
-              ? Border.all(color: Colors.white, width: 2)
+          border: Border.all(
+            color: _selectedFilterColor == color
+                ? Colors.white
+                : color.withOpacity(0.5),
+            width: _selectedFilterColor == color ? 2 : 1,
+          ),
+          boxShadow: _selectedFilterColor == color
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  )
+                ]
               : null,
         ),
         child: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            fontWeight: _selectedFilterColor == color
+                ? FontWeight.bold
+                : FontWeight.normal,
           ),
         ),
       ),
@@ -206,100 +330,194 @@ class _EventsPageState extends State<EventsPage> with NavBarPadding {
   Widget _buildEventCard(
       String title, String subtitle, String time, Color color) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20),
+        color:
+            Colors.grey[900]?.withOpacity(0.6) ?? Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.5),
+          width: 1.0,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
-            blurRadius: 6,
-            offset: Offset(0, 3),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start, // Align vertically
-        children: [
-          Expanded(
-            // Expands text without overflow
-            child: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                // Event color indicator
+                Container(
+                  width: 4,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 14,
+                const SizedBox(width: 12),
+
+                // Event details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: color.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              time,
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person,
+                            size: 16,
+                            color: color,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            subtitle,
+                            style: TextStyle(
+                              color: color,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 10),
-                // Avatars for participants
-                Wrap(
-                  spacing: 8.0, // Space between avatars
-                  runSpacing: 8.0,
-                  children: [
-                    _buildAvatar('Nethma'),
-                    _buildAvatar('Amantha'),
-                    _buildAvatar('Dimantha'),
-                    _buildAvatar('Hakkam'),
-                    _buildAvatarOverflow(2), // Indicates more participants
-                  ],
                 ),
               ],
             ),
-          ),
-          SizedBox(width: 8), // Spacing between text and time
-          // Right-side time display
-          Flexible(
-            child: Text(
-              time,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(height: 16),
 
-  Widget _buildAvatar(String name) {
-    return CircleAvatar(
-      radius: 16,
-      backgroundColor: Colors.white,
-      child: Text(
-        name[0], // Display first initialr
-        style: TextStyle(
-          color: Colors.black87,
-          fontWeight: FontWeight.bold,
+            // Participants
+            Row(
+              children: [
+                const Icon(
+                  Icons.people,
+                  size: 16,
+                  color: Colors.white54,
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Participants:',
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildAvatarChip('Nethma'),
+                        _buildAvatarChip('Amantha'),
+                        _buildAvatarChip('Dimantha'),
+                        _buildAvatarChip('Hakkam'),
+                        _buildAvatarOverflow(2),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
+  Widget _buildAvatarChip(String name) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 12,
+            backgroundColor: Colors.white.withOpacity(0.2),
+            child: Text(
+              name[0],
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAvatarOverflow(int extraCount) {
-    return CircleAvatar(
-      radius: 16,
-      backgroundColor: Colors.white.withOpacity(0.6),
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Text(
-        '+$extraCount', // Indicate extra participants
-        style: TextStyle(
-          color: Colors.black87,
+        '+$extraCount more',
+        style: const TextStyle(
+          color: Colors.white54,
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),
